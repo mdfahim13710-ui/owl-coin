@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OWL COIN</title>
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;background:#07111f;color:white;font-family:Arial,sans-serif;
+user-select:none;text-align:center
+}
+.app{max-width:480px;margin:auto;padding:18px}
+.top{display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:22px;font-weight:bold}
+.avatar{font-size:28px}
+h2{margin:18px 0 5px}
+.small{color:#8f9bad;font-size:14px}
+.score{
+font-size:34px;font-weight:bold;margin:12px 0
+}
+.energy{
+background:#142338;border-radius:20px;padding:9px;margin:15px 0
+}
+.coin{
+width:220px;height:220px;margin:25px auto;border-radius:50%;
+background:radial-gradient(circle at 35% 30%,#ffe878,#e5a800 55%,#8d5b00);
+display:flex;align-items:center;justify-content:center;
+font-size:105px;
+box-shadow:0 0 35px rgba(255,193,7,.45);
+transition:.08s
+}
+.coin:active{transform:scale(.94)}
+.tabs{
+position:fixed;bottom:0;left:0;right:0;
+background:#0d192a;border-top:1px solid #24344a;
+display:flex;justify-content:space-around;padding:12px 5px
+}
+.tab{font-size:12px;color:#aeb8c7}
+.tab b{display:block;font-size:22px;margin-bottom:3px}
+.panel{
+margin:15px 0 80px;background:#101e31;
+border-radius:16px;padding:16px
+}
+button{
+border:0;border-radius:12px;padding:13px 20px;
+background:#f3b800;font-weight:bold;font-size:16px
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="top">
+<div class="logo">🦉 OWL COIN</div>
+<div class="avatar">👤</div>
+</div>
+
+<h2>Welcome!</h2>
+<div class="small">Tap the owl and collect points</div>
+
+<div class="score" id="score">0</div>
+<div class="small">OWL POINTS</div>
+
+<div class="energy">⚡ <span id="energy">1000</span> / 1000</div>
+
+<div class="coin" onclick="tap()">🦉</div>
+
+<div class="panel">
+<button onclick="daily()">🎁 Daily Bonus +100</button>
+</div>
+
+</div>
+
+<div class="tabs">
+<div class="tab"><b>🦉</b>Home</div>
+<div class="tab"><b>👥</b>Friends</div>
+<div class="tab"><b>🎯</b>Tasks</div>
+<div class="tab"><b>🏆</b>League</div>
+</div>
+
+<script>
+let score=Number(localStorage.getItem("owl_score")||0);
+let energy=Number(localStorage.getItem("owl_energy")||1000);
+
+function save(){
+localStorage.setItem("owl_score",score);
+localStorage.setItem("owl_energy",energy);
+}
+
+function update(){
+document.getElementById("score").innerText=score.toLocaleString();
+document.getElementById("energy").innerText=energy;
+}
+
+function tap(){
+if(energy<=0)return;
+score++;
+energy--;
+save();
+update();
+}
+
+function daily(){
+score+=100;
+save();
+update();
+alert("🎁 +
