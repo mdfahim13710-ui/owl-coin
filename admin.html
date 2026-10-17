@@ -1,233 +1,106 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OWL COIN | Admin Panel</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OWL COIN — Admin Panel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}
-body{margin:0;padding:20px;background:#080f1e;color:#f8fafc;font-family:Arial,sans-serif}
-.panel{max-width:500px;margin:25px auto;padding:22px;background:#172238;border:1px solid #334155;border-radius:16px}
-h1{color:#facc15;text-align:center}
-h2,h3{text-align:center}
-input,textarea,button{display:block;width:100%;margin:10px 0;padding:13px;border-radius:9px;font-size:16px}
-input,textarea{background:#0b1220;color:white;border:1px solid #475569}
-button{background:#facc15;color:#111827;border:none;font-weight:bold;cursor:pointer}
-button:disabled{opacity:.6}
-.secondary{background:#cbd5e1}
-.link{display:block;color:#fde68a;text-align:center;margin:16px}
-#app{display:none}
-#status{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
-.task{margin-top:10px;padding:12px;border:1px solid #475569;border-radius:9px;overflow-wrap:anywhere}
+:root{color-scheme:dark;--bg:#07111f;--panel:#111f33;--line:#2b405b;--gold:#facc15;--muted:#a9bad0;--red:#fb7185;--green:#34d399}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#142641 0,#07111f 55%);color:#f8fafc;font:16px/1.45 system-ui,-apple-system,Segoe UI,Arial,sans-serif;min-height:100vh;padding:18px}.wrap{max-width:760px;margin:auto}.brand{text-align:center;margin:14px 0 22px}.owl{font-size:38px}.brand h1{margin:2px;color:var(--gold);letter-spacing:2px}.brand p{margin:4px;color:var(--muted)}.card{background:rgba(17,31,51,.96);border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0;box-shadow:0 12px 28px #0002}h2,h3{margin:0 0 14px}label{display:block;margin:12px 0 6px;color:#dbe7f5;font-size:14px}input,textarea{width:100%;border:1px solid #405570;background:#07111f;color:white;border-radius:10px;padding:12px;font:inherit;outline:none}input:focus,textarea:focus{border-color:var(--gold)}textarea{min-height:82px;resize:vertical}.btn{border:0;border-radius:10px;padding:12px 14px;font:700 14px system-ui;cursor:pointer;background:var(--gold);color:#111827}.btn:disabled{opacity:.55;cursor:wait}.btn.secondary{background:#263b55;color:#f8fafc;border:1px solid #405570}.btn.danger{background:#4a1f2a;color:#fecdd3;border:1px solid #7f1d1d}.btn.small{padding:8px 10px}.row{display:flex;gap:9px;flex-wrap:wrap}.row .btn{flex:1}.hint{color:var(--muted);font-size:13px}.status{white-space:pre-wrap;overflow-wrap:anywhere;margin:14px 0 0;color:#fde68a}.hidden{display:none!important}.topline{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.pill{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--muted)}.task{border:1px solid var(--line);border-radius:13px;padding:14px;margin-top:12px;background:#0b1728}.taskhead{display:flex;gap:10px;justify-content:space-between;align-items:start}.tasktitle{font-weight:750;overflow-wrap:anywhere}.task p{margin:8px 0;color:#c5d2e2;overflow-wrap:anywhere}.taskactions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.taskactions .btn{flex:1;min-width:110px}.empty{text-align:center;color:var(--muted);padding:22px}.stats{display:flex;gap:10px}.stat{flex:1;border:1px solid var(--line);border-radius:12px;padding:12px}.stat strong{display:block;font-size:24px;color:var(--gold)}@media(max-width:480px){body{padding:10px}.card{padding:15px}.taskhead{display:block}.pill{display:inline-block;margin-top:8px}.row .btn{min-width:100%}}
 </style>
 </head>
-<body>
-<main class="panel">
-<h1>🦉 OWL COIN</h1>
-<h2>Admin Panel</h2>
-
-<section id="login">
-<label for="email">Admin Gmail</label>
-<input id="email" type="email" placeholder="Registered Gmail" autocomplete="username">
-<label for="password">Password</label>
-<input id="password" type="password" placeholder="Supabase Auth Password" autocomplete="current-password">
-<button id="loginBtn" type="button">LOGIN</button>
-<a href="#" id="forgotBtn" class="link">Forgot Password?</a>
+<body><main class="wrap">
+<header class="brand"><div class="owl">🦉</div><h1>OWL COIN</h1><p>Admin Panel · Task Management</p></header>
+<section id="loginCard" class="card"><h2>Admin Login</h2><p class="hint">তোমার Supabase Auth-এ নিবন্ধিত Gmail ও password ব্যবহার করো।</p><form id="loginForm"><label for="email">Admin Gmail</label><input id="email" type="email" autocomplete="username" required placeholder="name@gmail.com"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required placeholder="Supabase Auth password"><div class="row" style="margin-top:14px"><button class="btn" id="loginBtn" type="submit">LOGIN</button><button class="btn secondary" id="forgotBtn" type="button">Forgot Password?</button></div></form><p id="loginStatus" class="status" role="status" aria-live="polite"></p></section>
+<section id="resetCard" class="card hidden"><h2>নতুন Password সেট করুন</h2><form id="resetForm"><label for="newPassword">নতুন Password (কমপক্ষে 8 অক্ষর)</label><input id="newPassword" type="password" minlength="8" autocomplete="new-password" required><label for="confirmPassword">Password আবার লিখুন</label><input id="confirmPassword" type="password" minlength="8" autocomplete="new-password" required><button class="btn" id="updatePasswordBtn" type="submit">UPDATE PASSWORD</button></form><p id="resetStatus" class="status" role="status" aria-live="polite"></p></section>
+<section id="dashboard" class="hidden">
+<div class="card"><div class="topline"><div><h2 style="margin-bottom:4px">Task Dashboard</h2><div id="signedIn" class="hint"></div></div><button id="logoutBtn" class="btn secondary" type="button">LOGOUT</button></div><div class="stats" style="margin-top:16px"><div class="stat"><span class="hint">মোট Task</span><strong id="totalCount">0</strong></div><div class="stat"><span class="hint">Active</span><strong id="activeCount">0</strong></div><div class="stat"><span class="hint">Inactive</span><strong id="inactiveCount">0</strong></div></div></div>
+<div class="card"><h2 id="formHeading">নতুন Task যোগ করুন</h2><form id="taskForm"><label for="title">Task Title *</label><input id="title" maxlength="160" required placeholder="যেমন: Join our Telegram channel"><label for="description">Description</label><textarea id="description" maxlength="2000" placeholder="Task সম্পর্কে বিস্তারিত"></textarea><label for="reward">Reward Points *</label><input id="reward" type="number" min="0" max="1000000000" step="1" required placeholder="100"><label for="taskUrl">Task URL (ঐচ্ছিক)</label><input id="taskUrl" type="url" placeholder="https://example.com"><div class="row" style="margin-top:14px"><button id="saveBtn" class="btn" type="submit">ADD TASK</button><button id="cancelEditBtn" class="btn secondary hidden" type="button">CANCEL EDIT</button></div></form><p id="formStatus" class="status" role="status" aria-live="polite"></p></div>
+<div class="card"><div class="topline"><h2 style="margin:0">সব Task</h2><button id="refreshBtn" class="btn secondary" type="button">↻ Refresh</button></div><label for="search">Task খুঁজুন</label><input id="search" type="search" placeholder="নাম বা বিবরণ লিখুন…"><div id="taskList" aria-live="polite"><div class="empty">Task লোড হচ্ছে…</div></div><p id="listStatus" class="status" role="status" aria-live="polite"></p></div>
 </section>
-
-<section id="app">
-<h3>নতুন Task যোগ করুন</h3>
-<input id="title" placeholder="Task title">
-<textarea id="description" placeholder="Task description"></textarea>
-<input id="reward" type="number" min="0" step="1" placeholder="Reward points">
-<input id="url" type="url" placeholder="Task URL (optional)">
-<button id="addBtn" type="button">ADD TASK</button>
-<button id="refreshBtn" class="secondary" type="button">REFRESH TASKS</button>
-<button id="logoutBtn" class="secondary" type="button">LOGOUT</button>
-<h3>বর্তমান Tasks</h3>
-<div id="tasks"></div>
-</section>
-<p id="status" role="status" aria-live="polite"></p>
+<p class="hint" style="text-align:center;margin:24px 0">সুরক্ষিত ব্যবহারের জন্য Supabase-এ admin_users এবং RLS সেটআপ আবশ্যক।</p>
 </main>
-
 <script>
 (async function(){
-const $=id=>document.getElementById(id);
-const status=msg=>{$("status").textContent=msg};
+  const $=id=>document.getElementById(id);
+  const SUPABASE_URL='https://kevqqgruoaparmkstmfr.supabase.co';
+  // index.html-এর একই Supabase Publishable key এখানে বসাও; secret/service_role key নয়।
+  const SUPABASE_KEY='sb_publishable_Anzwioa-AzlstiMSgPHu8Q_0-WCoymH';
+  const PAGE_URL='https://mdfahim13710-ui.github.io/owl-coin/admin.html';
+  let db=null, editingId=null, tasks=[];
+  const say=(id,msg)=>$(id).textContent=msg;
+  function setBusy(id,busy,label){const b=$(id);b.disabled=busy;if(label&&!b.dataset.original)b.dataset.original=b.textContent;b.textContent=busy?label:(b.dataset.original||b.textContent)}
+  function showLogin(msg=''){ $('loginCard').classList.remove('hidden');$('dashboard').classList.add('hidden');$('resetCard').classList.add('hidden');say('loginStatus',msg); }
+  function showDashboard(email){$('loginCard').classList.add('hidden');$('resetCard').classList.add('hidden');$('dashboard').classList.remove('hidden');say('signedIn',email||'Admin signed in');}
+  function showReset(){ $('loginCard').classList.add('hidden');$('dashboard').classList.add('hidden');$('resetCard').classList.remove('hidden');say('resetStatus',''); }
+  if(!window.supabase){say('loginStatus','Supabase library লোড হয়নি। ইন্টারনেট চালু করে পেজ Refresh করো।');return;}
+  if(SUPABASE_KEY==='PASTE_YOUR_PUBLISHABLE_KEY_HERE'){say('loginStatus','Setup দরকার: SUPABASE_KEY-তে Publishable Key বসাও।');return;}
+  db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const SUPABASE_URL="https://kevqqgruoaparmkstmfr.supabase.co";
+  async function verifyAdmin(user){
+    const {data,error}=await db.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
+    if(error) throw new Error('Admin permission যাচাই হয়নি: '+error.message+'। Supabase SQL setup চালানো হয়েছে কি না দেখো।');
+    if(!data) throw new Error('এই Gmail-কে Admin হিসেবে অনুমতি দেওয়া হয়নি। Supabase SQL Editor-এ admin_users-এ তোমার Auth user যোগ করতে হবে।');
+    return true;
+  }
+  async function enter(user){
+    try{await verifyAdmin(user);showDashboard(user.email);await loadTasks();}
+    catch(e){await db.auth.signOut();showLogin('⛔ '+e.message);}
+  }
+  $('loginForm').addEventListener('submit',async e=>{
+    e.preventDefault();const email=$('email').value.trim(),password=$('password').value;
+    if(!email||!password){say('loginStatus','Gmail ও password লিখো।');return;}
+    setBusy('loginBtn',true,'Login হচ্ছে…');say('loginStatus','');
+    try{const {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw new Error('Login হয়নি: '+error.message);await enter(data.user);}
+    catch(err){say('loginStatus','❌ '+(err.message||'Login করা যায়নি।'));}
+    finally{setBusy('loginBtn',false);}
+  });
+  $('resetForm').addEventListener('submit',async e=>{e.preventDefault();const p=$('newPassword').value,c=$('confirmPassword').value;if(p.length<8){say('resetStatus','Password কমপক্ষে 8 অক্ষরের হতে হবে।');return;}if(p!==c){say('resetStatus','দুটি Password মেলেনি।');return;}setBusy('updatePasswordBtn',true,'আপডেট হচ্ছে…');try{const {error}=await db.auth.updateUser({password:p});if(error)throw error;await db.auth.signOut();$('resetForm').reset();showLogin('Password পরিবর্তন হয়েছে। নতুন Password দিয়ে Login করো।');}catch(err){say('resetStatus','Password পরিবর্তন হয়নি: '+(err.message||'আবার চেষ্টা করো।'));}finally{setBusy('updatePasswordBtn',false);}});
+  db.auth.onAuthStateChange((event,session)=>{if(event==='PASSWORD_RECOVERY')showReset();});
+  $('forgotBtn').addEventListener('click',async()=>{
+    const email=$('email').value.trim();if(!email){say('loginStatus','আগে Gmail ঘরে registered email লেখো।');$('email').focus();return;}
+    setBusy('forgotBtn',true,'পাঠানো হচ্ছে…');
+    try{const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:PAGE_URL});if(error)throw error;say('loginStatus','Password reset request পাঠানো হয়েছে। Gmail Inbox/Spam দেখো। Supabase Auth URL Configuration-এ admin.html redirect URL allowlist থাকতে হবে।');}
+    catch(e){say('loginStatus','Reset failed: '+(e.message||'আবার চেষ্টা করো।'));}
+    finally{setBusy('forgotBtn',false);}
+  });
 
-// এখানে index.html-এর Publishable Key বসাও
-const SUPABASE_KEY="sb_publishable_Anzwioa-AzlstiMSgPHu8Q_0-WCoymH";
-
-if(!window.supabase){
-status("ইন্টারনেট পরীক্ষা করো। Supabase লোড হয়নি।");
-return;
-}
-if(SUPABASE_KEY==="PASTE_YOUR_PUBLISHABLE_KEY_HERE"){
-status("আগে SUPABASE_KEY বসাও।");
-return;
-}
-
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-
-$("loginBtn").addEventListener("click",async()=>{
-const email=$("email").value.trim();
-const password=$("password").value;
-if(!email||!password){
-status("Gmail ও Password দুটোই লিখো।");
-return;
-}
-$("loginBtn").disabled=true;
-status("Login হচ্ছে...");
-try{
-const {data,error}=await db.auth.signInWithPassword({email,password});
-if(error){
-status("LOGIN FAILED: Gmail অথবা Password সঠিক নয়।\n"+error.message);
-return;
-}
-if(!data.user){
-status("Login হয়নি। আবার চেষ্টা করো।");
-return;
-}
-$("login").style.display="none";
-$("app").style.display="block";
-await loadTasks();
-}catch(e){
-status("ERROR: "+e.message);
-}finally{
-$("loginBtn").disabled=false;
-}
-});
-
-$("forgotBtn").addEventListener("click",async e=>{
-e.preventDefault();
-const email=$("email").value.trim();
-if(!email){
-status("আগে Gmail ঘরে তোমার registered email লেখো।");
-$("email").focus();
-return;
-}
-status("Password reset email পাঠানো হচ্ছে...");
-try{
-const {error}=await db.auth.resetPasswordForEmail(email,{
-redirectTo:"https://mdfahim13710-ui.github.io/owl-coin/admin.html"
-});
-status(error?"Reset failed: "+error.message:"Request পাঠানো হয়েছে। Gmail Inbox ও Spam চেক করো।");
-}catch(e){
-status("ERROR: "+e.message);
-}
-});
-
-async function loadTasks(){
-$("tasks").textContent="Tasks লোড হচ্ছে...";
-try{
-const {data,error}=await db.from("tasks")
-.select("id,title,description,reward,task_url,is_active")
-.order("id");
-if(error){
-$("tasks").textContent="";
-status("Task লোড হয়নি: "+error.message);
-return;
-}
-$("tasks").replaceChildren();
-if(!data||!data.length){
-$("tasks").textContent="কোনো Task নেই।";
-return;
-}
-data.forEach(task=>{
-const card=document.createElement("div");
-card.className="task";
-const title=document.createElement("strong");
-title.textContent=task.title;
-const info=document.createElement("p");
-info.textContent=(task.description||"")+" | Reward: "+task.reward;
-const active=document.createElement("p");
-active.textContent=task.is_active?"Active":"Inactive";
-card.append(title,info,active);
-$("tasks").appendChild(card);
-});
-status("Task list আপডেট হয়েছে।");
-}catch(e){
-$("tasks").textContent="";
-status("ERROR: "+e.message);
-}
-}
-
-$("addBtn").addEventListener("click",async()=>{
-const title=$("title").value.trim();
-const description=$("description").value.trim();
-const rewardText=$("reward").value;
-const taskUrl=$("url").value.trim();
-const reward=Number(rewardText);
-
-if(!title||rewardText===""||!Number.isSafeInteger(reward)||reward<0){
-status("সঠিক Task title ও Reward points লিখো।");
-return;
-}
-if(taskUrl){
-try{
-const parsed=new URL(taskUrl);
-if(!["https:","http:"].includes(parsed.protocol)){
-status("Task URL সঠিক নয়।");
-return;
-}
-}catch{
-status("Task URL সঠিক নয়।");
-return;
-}
-}
-$("addBtn").disabled=true;
-status("Task যোগ হচ্ছে...");
-try{
-const {error}=await db.from("tasks").insert({
-title,description,reward,task_url:taskUrl||null,is_active:true
-});
-if(error){
-status("Task যোগ হয়নি: "+error.message+"\nSupabase RLS/permission ঠিক করতে হবে।");
-return;
-}
-$("title").value="";
-$("description").value="";
-$("reward").value="";
-$("url").value="";
-status("Task সফলভাবে যোগ হয়েছে!");
-await loadTasks();
-}catch(e){
-status("ERROR: "+e.message);
-}finally{
-$("addBtn").disabled=false;
-}
-});
-
-$("refreshBtn").addEventListener("click",loadTasks);
-
-$("logoutBtn").addEventListener("click",async()=>{
-const {error}=await db.auth.signOut();
-if(error){
-status("Logout failed: "+error.message);
-return;
-}
-$("app").style.display="none";
-$("login").style.display="block";
-$("password").value="";
-status("Logout সফল হয়েছে।");
-});
-
-try{
-const {data,error}=await db.auth.getSession();
-if(error){
-status("Session error: "+error.message);
-}else if(data.session){
-$("login").style.display="none";
-$("app").style.display="block";
-await loadTasks();
-}
-}catch(e){
-status("Startup error: "+e.message);
-}
+  function resetForm(){editingId=null;$('taskForm').reset();$('formHeading').textContent='নতুন Task যোগ করুন';$('saveBtn').textContent='ADD TASK';$('cancelEditBtn').classList.add('hidden');say('formStatus','');}
+  $('cancelEditBtn').addEventListener('click',resetForm);
+  $('taskForm').addEventListener('submit',async e=>{
+    e.preventDefault();const title=$('title').value.trim(),description=$('description').value.trim(),rewardText=$('reward').value,url=$('taskUrl').value.trim(),reward=Number(rewardText);
+    if(!title||rewardText===''||!Number.isSafeInteger(reward)||reward<0){say('formStatus','সঠিক Task title ও পূর্ণসংখ্যা Reward Points দাও।');return;}
+    if(url){try{const u=new URL(url);if(!['http:','https:'].includes(u.protocol))throw new Error();}catch{say('formStatus','সঠিক http/https Task URL দাও।');return;}}
+    setBusy('saveBtn',true,editingId?'আপডেট হচ্ছে…':'যোগ হচ্ছে…');
+    const payload={title,description:description||null,reward,task_url:url||null};
+    try{
+      const result=editingId?await db.from('tasks').update(payload).eq('id',editingId).select('id').maybeSingle():await db.from('tasks').insert({...payload,is_active:true}).select('id').single();
+      if(result.error)throw result.error;if(!result.data)throw new Error('পরিবর্তন হয়নি। Admin permission ও RLS পরীক্ষা করো।');
+      say('formStatus',editingId?'Task আপডেট হয়েছে।':'নতুন Task যোগ হয়েছে।');resetForm();await loadTasks();
+    }catch(err){say('formStatus','Task সেভ হয়নি: '+(err.message||'Unknown error')+'। Supabase admin-only RLS চালু আছে কি না দেখো।');}
+    finally{setBusy('saveBtn',false);}
+  });
+  function editTask(t){editingId=t.id;$('title').value=t.title||'';$('description').value=t.description||'';$('reward').value=t.reward??0;$('taskUrl').value=t.task_url||'';$('formHeading').textContent='Task Edit করুন';$('saveBtn').textContent='SAVE CHANGES';$('cancelEditBtn').classList.remove('hidden');say('formStatus','Editing: '+t.title);$('title').focus();window.scrollTo({top:0,behavior:'smooth'});}
+  async function changeActive(t){const next=!t.is_active;if(!confirm((next?'এই Task Active':'এই Task Inactive')+' করতে চাও?'))return;
+    try{const {data,error}=await db.from('tasks').update({is_active:next}).eq('id',t.id).select('id').maybeSingle();if(error)throw error;if(!data)throw new Error('Permission নেই বা Task পাওয়া যায়নি।');say('listStatus',next?'Task Active করা হয়েছে।':'Task Inactive করা হয়েছে।');await loadTasks();}
+    catch(e){say('listStatus','পরিবর্তন হয়নি: '+(e.message||'Unknown error'));}}
+  async function deleteTask(t){if(!confirm('সত্যিই এই Task স্থায়ীভাবে Delete করতে চাও?\n'+t.title))return;
+    try{const {data,error}=await db.from('tasks').delete().eq('id',t.id).select('id').maybeSingle();if(error)throw error;if(!data)throw new Error('Permission নেই বা Task পাওয়া যায়নি।');if(String(editingId)===String(t.id))resetForm();say('listStatus','Task Delete হয়েছে।');await loadTasks();}
+    catch(e){say('listStatus','Delete হয়নি: '+(e.message||'Unknown error'));}}
+  function renderTasks(){const q=$('search').value.trim().toLowerCase(),filtered=tasks.filter(t=>[t.title,t.description,t.task_url].some(v=>String(v||'').toLowerCase().includes(q)));const root=$('taskList');root.replaceChildren();
+    $('totalCount').textContent=tasks.length;$('activeCount').textContent=tasks.filter(t=>t.is_active).length;$('inactiveCount').textContent=tasks.filter(t=>!t.is_active).length;
+    if(!filtered.length){const d=document.createElement('div');d.className='empty';d.textContent=tasks.length?'কোনো মিল পাওয়া যায়নি।':'এখনো কোনো Task নেই।';root.appendChild(d);return;}
+    filtered.forEach(t=>{const card=document.createElement('article');card.className='task';const head=document.createElement('div');head.className='taskhead';const left=document.createElement('div');const title=document.createElement('div');title.className='tasktitle';title.textContent=t.title;left.appendChild(title);const pill=document.createElement('span');pill.className='pill';pill.textContent=t.is_active?'● Active':'○ Inactive';pill.style.color=t.is_active?'var(--green)':'var(--muted)';head.append(left,pill);card.appendChild(head);
+      const desc=document.createElement('p');desc.textContent=t.description||'কোনো বিবরণ নেই';card.appendChild(desc);const reward=document.createElement('p');reward.textContent='Reward: '+t.reward+' points';card.appendChild(reward);if(t.task_url){const link=document.createElement('a');link.href=t.task_url;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Task Link ↗';link.style.color='#fde68a';card.appendChild(link);}
+      const actions=document.createElement('div');actions.className='taskactions';const eb=document.createElement('button');eb.className='btn secondary small';eb.textContent='✎ Edit';eb.addEventListener('click',()=>editTask(t));const ab=document.createElement('button');ab.className='btn secondary small';ab.textContent=t.is_active?'Turn Off':'Activate';ab.addEventListener('click',()=>changeActive(t));const dbtn=document.createElement('button');dbtn.className='btn danger small';dbtn.textContent='Delete';dbtn.addEventListener('click',()=>deleteTask(t));actions.append(eb,ab,dbtn);card.appendChild(actions);root.appendChild(card);
+    });}
+  async function loadTasks(){say('listStatus','Task লোড হচ্ছে…');$('refreshBtn').disabled=true;
+    try{const {data,error}=await db.from('tasks').select('id,title,description,reward,task_url,is_active').order('id',{ascending:false});if(error)throw error;tasks=data||[];renderTasks();say('listStatus','Task list আপডেট হয়েছে।');}
+    catch(e){tasks=[];renderTasks();say('listStatus','Task লোড হয়নি: '+(e.message||'Unknown error')+'। SQL/RLS setup পরীক্ষা করো।');}
+    finally{$('refreshBtn').disabled=false;}}
+  $('refreshBtn').addEventListener('click',loadTasks);$('search').addEventListener('input',renderTasks);
+  $('logoutBtn').addEventListener('click',async()=>{const {error}=await db.auth.signOut();if(error){say('listStatus','Logout error: '+error.message);return;}resetForm();showLogin('Logout সফল হয়েছে।');$('password').value='';});
+  try{const {data,error}=await db.auth.getSession();if(error)throw error;if(data.session)await enter(data.session.user);}
+  catch(e){showLogin('Session error: '+(e.message||'পেজ Refresh করো।'));}
 })();
 </script>
-</body>
-</html>
+</body></html>
