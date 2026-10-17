@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OWL COIN Admin Panel</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #101827;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    .panel {
+      max-width: 500px;
+      margin: 30px auto;
+      background: #1e293b;
+      padding: 22px;
+      border-radius: 16px;
+    }
+    h1 { color: #facc15; }
+    input, textarea, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin: 7px 0;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      font-size: 16px;
+    }
+    input, textarea {
+      background: #0f172a;
+      color: white;
+    }
+    button {
+      background: #facc15;
+      color: #111827;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .task {
+      padding: 12px;
+      margin-top: 12px;
+      border: 1px solid #475569;
+      border-radius: 10px;
+      overflow-wrap: anywhere;
+    }
+    #app { display: none; }
+    #status { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>🦉 OWL COIN</h1>
+    <h2>Admin Panel</h2>
+
+    <div id="login">
+      <p>Admin Login</p>
+      <input id="email" type="email" placeholder="Admin Gmail">
+      <input id="password" type="password" placeholder="Admin password">
+      <button id="loginBtn">Login</button>
+    </div>
+
+    <div id="app">
+      <h3>Add New Task</h3>
+      <input id="title" placeholder="Task title">
+      <textarea id="description" placeholder="Task description"></textarea>
+      <input id="reward" type="number" min="0" placeholder="Reward">
+      <input id="url" type="url" placeholder="Task URL (optional)">
+      <button id="addBtn">Add Task</button>
+      <button id="refreshBtn">Refresh Tasks</button>
+      <button id="logoutBtn">Logout</button>
+      <h3>Current Tasks</h3>
+      <div id="tasks"></div>
+    </div>
+    <p id="status" role="status"></p>
+  </div>
+
+<script>
+const SUPABASE_URL =
+  "https://kevqqgruoaparmkstmfr.supabase.co";
+
+// Use the same Supabase Publishable Key as index.html.
+const SUPABASE_KEY = ""sb_publishable_Anzwioa-AzlstiMSgPHu8Q_0-WCoymH";";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL, SUPABASE_KEY
+);
+
+const $ = id => document.getElementById(id);
+const status = message => $("status").textContent = message;
+
+async function checkAdmin() {
+  const { data: { user } } = await db.auth.getUser();
+  $("login").style.display = user ? "none" : "block";
+  $("app").style.display = user ? "block" : "none";
+  if (user) await loadTasks();
+}
+
+$("loginBtn").onclick = async () => {
+  const { error } = await db.auth.signInWithPassword({
+    email: $("email").value.trim(),
+    password: $("password").value
+  });
+  if (error) return status("Login failed: " + error.message);
+  status("Logged in. Checking access...");
+  await checkAdmin();
+};
+
+async function loadTasks() {
+  const { data, error } = await db.from("tasks")
+    .select("id,title,description,reward,task_url,is_active")
+    .order("id");
+
+  if (error) {
+    status("Cannot load tasks. Admin database permissions are not configured yet.");
+    return;
+  }
+
+  $("tasks").replaceChildren();
+  data.forEach(task => {
+    const item = document.createElement("div");
+    item.className = "task";
+    const heading = document.createElement("strong");
+    heading.textContent = task.title;
+    const detail = document.createElement("p");
+    detail.textContent =
+      (task.description || "") + " | Reward: " + task.reward;
+    const state = document.createElement("p");
+    state.textContent = task.is_active ? "Active" : "Inactive";
+    item.append(heading, detail, state);
+    $("tasks").appendChild(item);
+  });
+}
+
+$("addBtn").onclick = async () => {
+  status("Task creation requires secure admin-only database permissions.");
+};
+
+$("refreshBtn").onclick = loadTasks;
+
+$("logoutBtn").onclick = async () => {
+  await db.auth.signOut();
+  $("app").style.display = "none";
+  $("login").style.display = "block";
+  status("Logged out.");
+};
+
+checkAdmin();
+</script>
+</body>
+</html>
