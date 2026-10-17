@@ -1,110 +1,230 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#07111f">
 <title>OWL COIN</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{box-sizing:border-box}
-body{
-margin:0;background:#07111f;color:white;font-family:Arial,sans-serif;
-user-select:none;text-align:center
-}
-.app{max-width:480px;margin:auto;padding:18px}
+body{margin:0;background:#07111f;color:white;font-family:Arial,sans-serif;user-select:none}
+.app{max-width:480px;margin:auto;padding:18px 18px 100px;text-align:center}
 .top{display:flex;justify-content:space-between;align-items:center}
-.logo{font-size:22px;font-weight:bold}
-.avatar{font-size:28px}
-h2{margin:18px 0 5px}
-.small{color:#8f9bad;font-size:14px}
-.score{
-font-size:34px;font-weight:bold;margin:12px 0
-}
-.energy{
-background:#142338;border-radius:20px;padding:9px;margin:15px 0
-}
-.coin{
-width:220px;height:220px;margin:25px auto;border-radius:50%;
-background:radial-gradient(circle at 35% 30%,#ffe878,#e5a800 55%,#8d5b00);
-display:flex;align-items:center;justify-content:center;
-font-size:105px;
-box-shadow:0 0 35px rgba(255,193,7,.45);
-transition:.08s
-}
+.logo{font-size:23px;font-weight:900;color:#ffd45c}
+.avatar{background:#172942;padding:10px;border-radius:50%;font-size:23px}
+h2{margin:25px 0 6px}
+.small{color:#94a5bd;font-size:13px}
+.score{font-size:36px;font-weight:900;margin:12px 0 3px}
+.energy{background:#14243a;border-radius:15px;padding:12px;margin-top:20px}
+.energybar{height:7px;background:#26364c;border-radius:10px;margin-top:9px;overflow:hidden}
+#energybar{height:100%;width:100%;background:#ffd04a;transition:width .2s}
+.coin{width:230px;height:230px;margin:26px auto 18px;border-radius:50%;
+background:radial-gradient(circle at 35% 25%,#fff0a0,#ffc52e 40%,#b67500 75%,#704000);
+border:5px solid #ffdc75;display:flex;align-items:center;justify-content:center;
+font-size:112px;box-shadow:0 0 35px #ffbe3638,inset 0 0 15px #fff6;
+cursor:pointer;touch-action:manipulation;transition:transform .08s}
 .coin:active{transform:scale(.94)}
-.tabs{
-position:fixed;bottom:0;left:0;right:0;
-background:#0d192a;border-top:1px solid #24344a;
-display:flex;justify-content:space-around;padding:12px 5px
-}
-.tab{font-size:12px;color:#aeb8c7}
-.tab b{display:block;font-size:22px;margin-bottom:3px}
-.panel{
-margin:15px 0 80px;background:#101e31;
-border-radius:16px;padding:16px
-}
-button{
-border:0;border-radius:12px;padding:13px 20px;
-background:#f3b800;font-weight:bold;font-size:16px
-}
+.panel{background:#101e31;border:1px solid #20334b;border-radius:18px;padding:17px;margin:18px 0}
+button{border:0;border-radius:12px;padding:13px;background:#ffca3a;color:#1a1a1a;font-size:15px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}
+.wide{width:100%;margin-top:12px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
+.stat{background:#14243a;border-radius:13px;padding:13px}
+.stat strong{display:block;font-size:19px;margin-bottom:5px}
+.tabs{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:auto;background:#0d192a;border-top:1px solid #24344a;display:flex;justify-content:space-around;padding:10px 2px calc(10px + env(safe-area-inset-bottom));z-index:5}
+.tab{flex:1;color:#9eacc0;font-size:11px;cursor:pointer}
+.tab b{display:block;font-size:22px;margin-bottom:5px}
+.tab.active{color:#ffd04a}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;background:#172942;padding:13px;border-radius:13px;margin:10px 0}
+.item button{padding:10px;font-size:13px}
+.notice{font-size:12px;color:#91a4bb;line-height:1.5}
 </style>
 </head>
-
 <body>
-
 <div class="app">
-
-<div class="top">
-<div class="logo">🦉 OWL COIN</div>
-<div class="avatar">👤</div>
+ <div class="top">
+  <div class="logo">🦉 OWL COIN</div>
+  <div class="avatar">👤</div>
+ </div>
+ <div id="screen"></div>
 </div>
 
-<h2>Welcome!</h2>
-<div class="small">Tap the owl and collect points</div>
-
-<div class="score" id="score">0</div>
-<div class="small">OWL POINTS</div>
-
-<div class="energy">⚡ <span id="energy">1000</span> / 1000</div>
-
-<div class="coin" onclick="tap()">🦉</div>
-
-<div class="panel">
-<button onclick="daily()">🎁 Daily Bonus +100</button>
-</div>
-
-</div>
-
-<div class="tabs">
-<div class="tab"><b>🦉</b>Home</div>
-<div class="tab"><b>👥</b>Friends</div>
-<div class="tab"><b>🎯</b>Tasks</div>
-<div class="tab"><b>🏆</b>League</div>
-</div>
+<nav class="tabs">
+ <div class="tab active" data-page="home"><b>🦉</b>Home</div>
+ <div class="tab" data-page="friends"><b>👥</b>Friends</div>
+ <div class="tab" data-page="tasks"><b>🎯</b>Tasks</div>
+ <div class="tab" data-page="league"><b>🏆</b>League</div>
+</nav>
 
 <script>
-let score=Number(localStorage.getItem("owl_score")||0);
-let energy=Number(localStorage.getItem("owl_energy")||1000);
+const tg=window.Telegram?.WebApp;
+tg?.ready();
+tg?.expand();
+
+const defaults={
+ score:0, energy:1000, lastEnergy:Date.now(),
+ dailyDate:"", level:1, page:"home", tasks:[]
+};
+let data;
+try{
+ data={...defaults,...JSON.parse(localStorage.getItem("owl_data")||"{}")};
+}catch(e){data={...defaults};}
+
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.floor(n).toLocaleString();
+const MAX=1000;
 
 function save(){
-localStorage.setItem("owl_score",score);
-localStorage.setItem("owl_energy",energy);
+ try{localStorage.setItem("owl_data",JSON.stringify(data));}catch(e){}
 }
-
-function update(){
-document.getElementById("score").innerText=score.toLocaleString();
-document.getElementById("energy").innerText=energy;
+function recoverEnergy(){
+ const now=Date.now();
+ const elapsed=Math.floor((now-(data.lastEnergy||now))/3000);
+ if(elapsed>0){
+  data.energy=Math.min(MAX,data.energy+elapsed);
+  data.lastEnergy+=elapsed*3000;
+  if(data.energy===MAX)data.lastEnergy=now;
+  save();
+ }
 }
-
+function header(title,sub){
+ return `<h2>${title}</h2><div class="small">${sub}</div>`;
+}
+function home(){
+ return `${header("Welcome to OWL COIN!","Tap the owl and collect points")}
+ <div class="score">${fmt(data.score)}</div>
+ <div class="small">🪙 OWL POINTS</div>
+ <div class="energy">⚡ <b id="energy">${fmt(data.energy)}</b> / ${MAX} ENERGY
+  <div class="energybar"><div id="energybar" style="width:${data.energy/MAX*100}%"></div></div>
+ </div>
+ <div class="coin" id="coin">🦉</div>
+ <div class="small">TAP THE OWL TO EARN COINS</div>
+ <div class="stats">
+  <div class="stat"><strong>⚡ ${data.level}</strong><span class="small">Tap Power</span></div>
+  <div class="stat"><strong>🏅 ${leagueName()}</strong><span class="small">Your League</span></div>
+ </div>
+ <div class="panel">
+  <h3>🎁 Daily Reward</h3>
+  <p class="small">Claim 100 bonus coins once every day.</p>
+  <button class="wide" id="daily" ${data.dailyDate===today()?"disabled":""}>
+  ${data.dailyDate===today()?"✅ Already Claimed":"🎁 CLAIM +100"}
+  </button>
+ </div>`;
+}
+function today(){
+ return new Date().toLocaleDateString("en-CA");
+}
+function leagueName(){
+ if(data.score>=100000)return "Diamond";
+ if(data.score>=25000)return "Gold";
+ if(data.score>=5000)return "Silver";
+ return "Bronze";
+}
+function friends(){
+ return `${header("👥 Friends","Grow your OWL COIN community")}
+ <div class="panel">
+  <div style="font-size:55px">🦉🤝🦉</div>
+  <h3>Invite Friends</h3>
+  <p class="small">Share your game link with friends.</p>
+  <button class="wide" id="share">📨 INVITE FRIENDS</button>
+  <p class="notice">Referral rewards require a verified referral system on a server.</p>
+ </div>`;
+}
+function tasks(){
+ return `${header("🎯 Tasks","Complete tasks and earn rewards")}
+ <div class="item"><div>🦉<br><b>Welcome Bonus</b><br><span class="small">Earn 100 coins</span></div>
+ <button id="welcome" ${data.tasks.includes("welcome")?"disabled":""}>${data.tasks.includes("welcome")?"Claimed":"+100"}</button></div>
+ <div class="item"><div>🚀<br><b>Explore OWL COIN</b><br><span class="small">Visit the Home page</span></div>
+ <button id="explore" ${data.tasks.includes("explore")?"disabled":""}>${data.tasks.includes("explore")?"Claimed":"+50"}</button></div>
+ <p class="notice">Social tasks need real verification before rewards can be trusted.</p>`;
+}
+function league(){
+ return `${header("🏆 League","Climb the OWL COIN rankings")}
+ <div class="panel">
+  <div style="font-size:60px">🏆</div>
+  <h2>${leagueName()} League</h2>
+  <div class="score">${fmt(data.score)}</div>
+  <div class="small">Total OWL POINTS</div>
+ </div>
+ <div class="item"><span>🥉 Bronze</span><b>0 points</b></div>
+ <div class="item"><span>🥈 Silver</span><b>5,000 points</b></div>
+ <div class="item"><span>🥇 Gold</span><b>25,000 points</b></div>
+ <div class="item"><span>💎 Diamond</span><b>100,000 points</b></div>`;
+}
+function render(){
+ recoverEnergy();
+ const pages={home,friends,tasks,league};
+ $("screen").innerHTML=pages[data.page]();
+ document.querySelectorAll(".tab").forEach(t=>{
+  t.classList.toggle("active",t.dataset.page===data.page);
+ });
+ bind();
+}
+function bind(){
+ const coin=$("coin");
+ if(coin)coin.onclick=tap;
+ const daily=$("daily");
+ if(daily)daily.onclick=claimDaily;
+ const share=$("share");
+ if(share)share.onclick=()=>{
+  const link="https://t.me/"+(tg?.initDataUnsafe?.user?"":"");
+  if(tg?.initDataUnsafe?.user){
+   tg.openTelegramLink("https://t.me/share/url?url="+encodeURIComponent(location.href)+"&text="+encodeURIComponent("Play OWL COIN 🦉"));
+  }else if(navigator.share){
+   navigator.share({title:"OWL COIN",url:location.href}).catch(()=>{});
+  }else{
+   alert("Share your OWL COIN game link with friends!");
+  }
+ };
+ const welcome=$("welcome");
+ if(welcome)welcome.onclick=()=>claimTask("welcome",100);
+ const explore=$("explore");
+ if(explore)explore.onclick=()=>claimTask("explore",50);
+}
 function tap(){
-if(energy<=0)return;
-score++;
-energy--;
-save();
-update();
+ recoverEnergy();
+ if(data.energy<=0)return;
+ data.score+=data.level;
+ data.energy--;
+ save();
+ $("score")&&($("score").textContent=fmt(data.score));
+ render();
 }
+function claimDaily(){
+ if(data.dailyDate===today())return;
+ data.dailyDate=today();
+ data.score+=100;
+ save();
+ render();
+ alert("🎁 Daily Bonus: +100 OWL COINS!");
+}
+function claimTask(name,reward){
+ if(data.tasks.includes(name))return;
+ data.tasks.push(name);
+ data.score+=reward;
+ save();
+ render();
+ alert("🎉 You earned "+reward+" OWL COINS!");
+}
+document.querySelectorAll(".tab").forEach(t=>{
+ t.addEventListener("click",()=>{
+  data.page=t.dataset.page;
+  save();
+  render();
+ });
+});
+setInterval(()=>{
+ const old=data.energy;
+ recoverEnergy();
+ const energy=$("energy"),bar=$("energybar");
+ if(energy)energy.textContent=fmt(data.energy);
+ if(bar)bar.style.width=(data.energy/MAX*100)+"%";
+ if(old!==data.energy)save();
+},1000);
+render();
+</script>
+</body>
+</html>
 
-function daily(){
-score+=100;
-save();
-update();
-alert("🎁 +
