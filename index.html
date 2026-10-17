@@ -62,5 +62,76 @@ setInterval(()=>{const old=data.energy;recoverEnergy();const energy=$("energy"),
 setInterval(()=>{if(data.page==="league")loadCoinRank();},5000);
 render();
 </script>
+ <!-- OWL COIN Join & Claim -->
+<div id="joinClaimBox">
+  <button id="joinChannelBtn">JOIN CHANNEL</button>
+  <button id="claimBtn" style="display:none;">CLAIM 10,000 COIN</button>
+  <p id="claimStatus"></p>
+</div>
+  <script>
+const joinBtn = document.getElementById("joinChannelBtn");
+const claimBtn = document.getElementById("claimBtn");
+const claimStatus = document.getElementById("claimStatus");
+
+const SUPABASE_FUNCTION =
+  "https://kevqqgruoaparmkstmfr.supabase.co/functions/v1/register-user";
+
+joinBtn.onclick = () => {
+  window.open("https://t.me/owlcoin137", "_blank");
+
+  claimStatus.textContent =
+    "Channel-এ Join করে আবার এই অ্যাপে ফিরে আসুন।";
+  
+  claimBtn.style.display = "block";
+};
+
+claimBtn.onclick = async () => {
+  const tg = window.Telegram?.WebApp;
+  const user = tg?.initDataUnsafe?.user;
+
+  if (!user?.id) {
+    claimStatus.textContent =
+      "Telegram user তথ্য পাওয়া যাচ্ছে না।";
+    return;
+  }
+
+  claimBtn.disabled = true;
+  claimStatus.textContent = "Checking membership...";
+
+  try {
+    const response = await fetch(SUPABASE_FUNCTION, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        telegram_id: user.id,
+        username: user.username || user.first_name || "",
+        photo_url: user.photo_url || ""
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.claimed) {
+      claimStatus.textContent =
+        "🎉 10,000 COIN সফলভাবে Claim হয়েছে!";
+    } else if (data.joined) {
+      claimStatus.textContent =
+        data.message || "Bonus already claimed.";
+    } else {
+      claimStatus.textContent =
+        "❌ আগে Channel-এ Join করুন।";
+    }
+
+  } catch (error) {
+    console.error(error);
+    claimStatus.textContent =
+      "❌ Claim করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।";
+  }
+
+  claimBtn.disabled = false;
+};
+</script>
 </body>
 </html>
