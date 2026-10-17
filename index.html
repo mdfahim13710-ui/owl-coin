@@ -5,133 +5,1356 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#07111f">
 <title>OWL COIN</title>
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#07111f;color:white;font-family:Arial,sans-serif;user-select:none}.app{max-width:560px;margin:auto;padding:18px 12px 100px;text-align:center}.top{display:flex;justify-content:space-between;align-items:center}.logo{font-size:23px;font-weight:900;color:#ffd45c}.avatar{background:#172942;width:42px;height:42px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px}.avatar img{width:100%;height:100%;object-fit:cover}h2{margin:25px 0 6px}.small{color:#94a5bd;font-size:13px}.score{font-size:36px;font-weight:900;margin:12px 0 3px}.energy{background:#14243a;border-radius:15px;padding:12px;margin-top:20px}.energybar{height:7px;background:#26364c;border-radius:10px;margin-top:9px;overflow:hidden}#energybar{height:100%;width:100%;background:#ffd04a;transition:width .2s}.coin{width:min(510px,calc(100vw - 24px));height:min(510px,calc(100vw - 24px));margin:26px auto 18px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff0a0,#ffc52e 40%,#b67500 75%,#704000);border:5px solid #ffdc75;display:flex;align-items:center;justify-content:center;font-size:clamp(145px,38vw,185px);box-shadow:0 0 42px #ffbe3638,inset 0 0 15px #fff6;cursor:pointer;touch-action:none;transition:transform .08s; -webkit-user-select:none;user-select:none}.coin:active{transform:scale(.94)}.panel{background:#101e31;border:1px solid #20334b;border-radius:18px;padding:17px;margin:18px 0}button{border:0;border-radius:12px;padding:13px;background:#ffca3a;color:#1a1a1a;font-size:15px;font-weight:bold;cursor:pointer}button:disabled{opacity:.5}.wide{width:100%;margin-top:12px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.stat{background:#14243a;border-radius:13px;padding:13px}.stat strong{display:block;font-size:19px;margin-bottom:5px}.tabs{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:auto;background:#0d192a;border-top:1px solid #24344a;display:flex;justify-content:space-around;padding:10px 2px calc(10px + env(safe-area-inset-bottom));z-index:5}.tab{flex:1;color:#9eacc0;font-size:11px;cursor:pointer}.tab b{display:block;font-size:22px;margin-bottom:5px}.tab.active{color:#ffd04a}.item{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;background:#172942;padding:13px;border-radius:13px;margin:10px 0}.item button{padding:10px;font-size:13px}.notice{font-size:12px;color:#91a4bb;line-height:1.5}.rank-row{display:flex;align-items:center;gap:10px;text-align:left;background:#14243a;border:1px solid #20334b;border-radius:13px;padding:10px;margin:8px 0}.rank-no{width:32px;min-width:32px;font-weight:900;text-align:center;color:#ffd45c}.rank-photo{width:42px;height:42px;min-width:42px;border-radius:50%;background:#26364c;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:18px}.rank-photo img{width:100%;height:100%;object-fit:cover}.rank-user{flex:1;min-width:0}.rank-name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rank-handle{font-size:11px;color:#94a5bd;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rank-coins{font-weight:800;color:#ffd45c;white-space:nowrap;font-size:13px}.empty{padding:22px;color:#94a5bd;background:#101e31;border-radius:14px;margin-top:15px}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#07111f;color:#fff;font-family:Arial,sans-serif}
+body{user-select:none;-webkit-user-select:none}
+button{border:0;cursor:pointer;font-weight:800}
+.app{max-width:560px;margin:auto;padding:16px 12px 105px}
+
+.top{
+ display:flex;align-items:center;justify-content:space-between;
+ padding:4px 2px
+}
+.logo{font-size:23px;font-weight:900;color:#ffd45c}
+.avatar{
+ width:43px;height:43px;border-radius:50%;overflow:hidden;
+ background:#172942;display:flex;align-items:center;
+ justify-content:center;font-size:20px
+}
+.avatar img{width:100%;height:100%;object-fit:cover}
+
+h2{margin:22px 0 5px}
+.small{font-size:13px;color:#94a5bd}
+.score{font-size:38px;font-weight:900;margin:12px 0 2px}
+
+.energy{
+ margin-top:18px;background:#101e31;border:1px solid #20334b;
+ border-radius:16px;padding:13px
+}
+.energybar{
+ height:8px;background:#26364c;border-radius:20px;
+ margin-top:9px;overflow:hidden
+}
+#energybar{
+ height:100%;width:100%;background:#ffd04a;
+ transition:width .2s
+}
+
+.coin{
+ width:min(430px,calc(100vw - 34px));
+ height:min(430px,calc(100vw - 34px));
+ margin:25px auto 16px;border-radius:50%;
+ display:flex;align-items:center;justify-content:center;
+ font-size:clamp(135px,36vw,175px);
+ background:radial-gradient(circle at 35% 25%,
+ #fff3a6 0%,#ffc52e 42%,#b67500 76%,#704000 100%);
+ border:5px solid #ffdc75;
+ box-shadow:0 0 45px #ffbe3638,inset 0 0 18px #fff7;
+ touch-action:none;
+ transition:transform .08s
+}
+.coin:active{transform:scale(.94)}
+
+.panel{
+ background:#101e31;border:1px solid #20334b;
+ border-radius:18px;padding:16px;margin:16px 0
+}
+
+button{
+ background:#ffca3a;color:#171717;
+ border-radius:12px;padding:13px 16px;font-size:14px
+}
+button:disabled{opacity:.5;cursor:not-allowed}
+.wide{width:100%;margin-top:10px}
+
+.stats{
+ display:grid;grid-template-columns:1fr 1fr;
+ gap:10px;margin-top:14px
+}
+.stat{
+ background:#14243a;border-radius:13px;padding:13px
+}
+.stat strong{display:block;font-size:18px;margin-bottom:5px}
+
+.item{
+ display:flex;align-items:center;justify-content:space-between;
+ gap:10px;text-align:left;background:#172942;
+ border-radius:13px;padding:13px;margin:9px 0
+}
+
+.notice{
+ font-size:12px;color:#91a4bb;line-height:1.5
+}
+
+.claim-box{
+ background:linear-gradient(145deg,#142b42,#101e31);
+ border:1px solid #31516f;border-radius:18px;
+ padding:18px;margin-top:18px
+}
+.claim-icon{font-size:48px}
+.claim-title{font-size:20px;font-weight:900;margin:7px 0}
+.claim-reward{font-size:26px;font-weight:900;color:#ffd45c;margin:8px 0}
+.claim-status{
+ margin-top:10px;min-height:20px;
+ color:#94a5bd;font-size:13px
+}
+
+.rank-row{
+ display:flex;align-items:center;gap:9px;
+ text-align:left;background:#14243a;
+ border:1px solid #20334b;border-radius:13px;
+ padding:10px;margin:8px 0
+}
+.rank-no{
+ width:31px;min-width:31px;text-align:center;
+ font-weight:900;color:#ffd45c
+}
+.rank-photo{
+ width:42px;height:42px;min-width:42px;
+ border-radius:50%;overflow:hidden;
+ background:#26364c;
+ display:flex;align-items:center;justify-content:center
+}
+.rank-photo img{width:100%;height:100%;object-fit:cover}
+.rank-user{flex:1;min-width:0}
+.rank-name{
+ font-weight:800;white-space:nowrap;
+ overflow:hidden;text-overflow:ellipsis
+}
+.rank-handle{
+ font-size:11px;color:#94a5bd;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+ margin-top:3px
+}
+.rank-coins{
+ color:#ffd45c;font-weight:900;
+ white-space:nowrap;font-size:13px
+}
+
+.empty{
+ padding:22px;text-align:center;color:#94a5bd;
+ background:#101e31;border-radius:14px;margin-top:12px
+}
+
+.tabs{
+ position:fixed;bottom:0;left:0;right:0;
+ max-width:560px;margin:auto;z-index:20;
+ display:flex;background:#0d192a;
+ border-top:1px solid #24344a;
+ padding:9px 2px calc(9px + env(safe-area-inset-bottom))
+}
+.tab{
+ flex:1;text-align:center;color:#8495ab;
+ font-size:10px;cursor:pointer
+}
+.tab b{display:block;font-size:21px;margin-bottom:4px}
+.tab.active{color:#ffd04a}
 </style>
 </head>
+
 <body>
+
 <div class="app">
- <div class="top"><div class="logo">🦉 OWL COIN</div><div class="avatar" id="top-avatar">👤</div></div>
- <div id="screen"></div>
+
+<div class="top">
+  <div class="logo">🦉 OWL COIN</div>
+  <div class="avatar" id="top-avatar">👤</div>
 </div>
+
+<div id="screen"></div>
+
+</div>
+
 <nav class="tabs">
- <div class="tab active" data-page="home"><b>🦉</b>Home</div>
- <div class="tab" data-page="friends"><b>👥</b>Friends</div>
- <div class="tab" data-page="tasks"><b>🎯</b>Tasks</div>
- <div class="tab" data-page="league"><b>🏆</b>COIN RANK</div>
+  <div class="tab active" data-page="home">
+    <b>🦉</b>Home
+  </div>
+  <div class="tab" data-page="friends">
+    <b>👥</b>Friends
+  </div>
+  <div class="tab" data-page="tasks">
+    <b>🎯</b>Tasks
+  </div>
+  <div class="tab" data-page="league">
+    <b>🏆</b>Rank
+  </div>
 </nav>
+
 <script>
-const tg=window.Telegram?.WebApp;tg?.ready();tg?.expand();
-const defaults={score:0,energy:1000,lastEnergy:Date.now(),dailyDate:"",level:1,page:"home",tasks:[]};
-let data;try{data={...defaults,...JSON.parse(localStorage.getItem("owl_data")||"{}")};}catch(e){data={...defaults};}
-const $=id=>document.getElementById(id),fmt=n=>Math.floor(Number(n)||0).toLocaleString(),MAX=1000;
-const SUPABASE_URL="https://kevqqgruoaparmkstmfr.supabase.co";
-const SUPABASE_KEY="sb_publishable_Anzwioa-AzlstiMSgPHu8Q_0-WCoymH";
-const supabaseClient=window.supabase?.createClient(SUPABASE_URL,SUPABASE_KEY);
-const telegramUser=tg?.initDataUnsafe?.user||null;
-function save(){try{localStorage.setItem("owl_data",JSON.stringify(data));}catch(e){}}
-function recoverEnergy(){const now=Date.now(),elapsed=Math.floor((now-(data.lastEnergy||now))/3000);if(elapsed>0){data.energy=Math.min(MAX,data.energy+elapsed);data.lastEnergy+=elapsed*3000;if(data.energy===MAX)data.lastEnergy=now;save();}}
-function header(title,sub){return `<h2>${title}</h2><div class="small">${sub}</div>`;}
-function today(){return new Date().toLocaleDateString("en-CA");}
-function leagueName(){if(data.score>=100000)return "Diamond";if(data.score>=25000)return "Gold";if(data.score>=5000)return "Silver";return "Bronze";}
-function home(){return `${header("Welcome to OWL COIN!","Tap the owl and collect points")}<div class="score">${fmt(data.score)}</div><div class="small">🪙 OWL POINTS</div><div class="energy">⚡ <b id="energy">${fmt(data.energy)}</b> / ${MAX} ENERGY<div class="energybar"><div id="energybar" style="width:${data.energy/MAX*100}%"></div></div></div><div class="coin" id="coin">🦉</div><div class="small">TAP THE OWL TO EARN COINS</div><div class="stats"><div class="stat"><strong>⚡ ${data.level}</strong><span class="small">Tap Power</span></div><div class="stat"><strong>🏅 ${leagueName()}</strong><span class="small">Your League</span></div></div><div class="panel"><h3>🎁 Daily Reward</h3><p class="small">Claim 100 bonus coins once every day.</p><button class="wide" id="daily" ${data.dailyDate===today()?"disabled":""}>${data.dailyDate===today()?"✅ Already Claimed":"🎁 CLAIM +100"}</button></div>`;}
-function friends(){return `${header("👥 Friends","Grow your OWL COIN community")}<div class="panel"><div style="font-size:55px">🦉🤝🦉</div><h3>Invite Friends</h3><p class="small">Share your game link with friends.</p><button class="wide" id="share">📨 INVITE FRIENDS</button><p class="notice">Referral rewards require a verified referral system on a server.</p></div>`;}
-function tasks(){return `${header("🎯 Tasks","Complete tasks and earn rewards")}<div class="item"><div>🦉<br><b>Welcome Bonus</b><br><span class="small">Earn 100 coins</span></div><button id="welcome" ${data.tasks.includes("welcome")?"disabled":""}>${data.tasks.includes("welcome")?"Claimed":"+100"}</button></div><div class="item"><div>🚀<br><b>Explore OWL COIN</b><br><span class="small">Visit the Home page</span></div><button id="explore" ${data.tasks.includes("explore")?"disabled":""}>${data.tasks.includes("explore")?"Claimed":"+50"}</button></div><div id="owl-tasks"><p class="notice">Loading extra tasks...</p></div><p class="notice">Social tasks need real verification before rewards can be trusted.</p>`;}
-function league(){return `${header("🏆 COIN RANK","Top 100 miners ranked by total coins")}<div class="panel"><div style="font-size:42px">🏆</div><h3>TOP 100</h3><p class="notice">Rankings refresh automatically every 5 seconds.</p></div><div id="rank-list"><div class="empty">Loading Coin Rank...</div></div>`;}
-function render(){recoverEnergy();const pages={home,friends,tasks,league};$("screen").innerHTML=pages[data.page]();document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.page===data.page));bind();if(data.page==="league")loadCoinRank();if(data.page==="tasks")showOwlTasks();}
-function bind(){const coin=$("coin");if(coin){coin.addEventListener("pointerdown",handleCoinPointer,{passive:false});}const daily=$("daily");if(daily)daily.onclick=claimDaily;const share=$("share");if(share)share.onclick=()=>{if(tg?.initDataUnsafe?.user){tg.openTelegramLink("https://t.me/share/url?url="+encodeURIComponent(location.href)+"&text="+encodeURIComponent("Play OWL COIN 🦉"));}else if(navigator.share){navigator.share({title:"OWL COIN",url:location.href}).catch(()=>{});}else alert("Share your OWL COIN game link with friends!");};const welcome=$("welcome");if(welcome)welcome.onclick=()=>claimTask("welcome",100);const explore=$("explore");if(explore)explore.onclick=()=>claimTask("explore",50);}
-// Each finger press is handled as its own pointer event, allowing multi-touch.
-function handleCoinPointer(event){
-  if(event.cancelable)event.preventDefault();
-  if(event.button!==undefined && event.button!==0)return;
-  tapMany(1);
-}
-function tapMany(count){recoverEnergy();const earned=Math.min(count,Math.max(0,Math.floor(data.energy)));if(earned<=0)return;data.score+=data.level*earned;data.energy-=earned;save();updateHomeStats();const coin=$("coin");if(coin){coin.style.transform="scale(.96)";requestAnimationFrame(()=>{if($("coin"))$("coin").style.transform="scale(1)";});}}
-function updateHomeStats(){const score=document.querySelector("#screen .score"),energy=$("energy"),bar=$("energybar");if(score)score.textContent=fmt(data.score);if(energy)energy.textContent=fmt(data.energy);if(bar)bar.style.width=(data.energy/MAX*100)+"%";const stats=document.querySelectorAll("#screen .stat strong");if(stats[1])stats[1].textContent="🏅 "+leagueName();}
-function claimDaily(){if(data.dailyDate===today())return;data.dailyDate=today();data.score+=100;save();render();alert("🎁 Daily Bonus: +100 OWL COINS!");}
-function claimTask(name,reward){if(data.tasks.includes(name))return;data.tasks.push(name);data.score+=reward;save();render();alert("🎉 You earned "+reward+" OWL COINS!");}
-function safeText(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-async function loadCoinRank(){const list=$("rank-list");if(!list)return;list.innerHTML='<div class="empty">Loading Coin Rank...</div>';if(!supabaseClient){list.innerHTML='<div class="empty">Could not connect to the leaderboard service. Please try again later.</div>';return;}try{const {data:rows,error}=await supabaseClient.from("profiles").select("telegram_id, username, balance, photo_url").order("balance",{ascending:false}).limit(100);if(error)throw error;if(!rows||rows.length===0){list.innerHTML='<div class="empty">No rankings yet: the profiles table has no saved miners. Your Home coins are currently stored only on this device, so they are not automatically added to COIN RANK. Telegram accounts and balances must be securely saved to Supabase first.</div>';return;}list.innerHTML="";rows.forEach((p,i)=>{const name=p.username?String(p.username).replace(/^@/,""):(p.telegram_id?"Telegram User "+p.telegram_id:"Miner");const photo=p.photo_url?`<img src="${safeText(p.photo_url)}" alt="">`:"🦉";const row=document.createElement("div");row.className="rank-row";row.innerHTML=`<div class="rank-no">${i===0?"🥇":i===1?"🥈":i===2?"🥉":"#"+(i+1)}</div><div class="rank-photo">${photo}</div><div class="rank-user"><div class="rank-name">${safeText(name)}</div><div class="rank-handle">${p.telegram_id?"Telegram ID: "+safeText(p.telegram_id):"OWL COIN Miner"}</div></div><div class="rank-coins">${fmt(p.balance)}<br><span class="small">COIN</span></div>`;list.appendChild(row);});}catch(e){console.error("Coin Rank error:",e);list.innerHTML='<div class="empty">COIN RANK could not load. Check that profiles has telegram_id, username, balance, photo_url columns and that public read access is configured safely.</div>';}}
-async function showOwlTasks(){const box=$("owl-tasks");if(!box||!supabaseClient)return;try{const {data:rows,error}=await supabaseClient.from("tasks").select("id,title,description,reward,task_url").eq("is_active",true);if(error)throw error;box.innerHTML="";rows.forEach(task=>{const item=document.createElement("div");item.className="item";const info=document.createElement("div");const title=document.createElement("b");title.textContent=task.title;const desc=document.createElement("p");desc.className="small";desc.textContent=task.description||"";const reward=document.createElement("p");reward.className="small";reward.textContent="🎁 Reward: "+fmt(task.reward)+" Coins";info.append(title,desc,reward);item.append(info);if(task.task_url){const link=document.createElement("button");link.textContent="Open";link.onclick=()=>{if(tg?.openLink)tg.openLink(task.task_url);else window.open(task.task_url,"_blank","noopener");};item.append(link);}box.append(item);});if(!rows.length)box.innerHTML='<p class="notice">No active tasks right now.</p>';}catch(e){console.error("Task loading error:",e);box.innerHTML='<p class="notice">Extra tasks could not be loaded.</p>';}}
-document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{data.page=t.dataset.page;save();render();}));
-if(telegramUser){const topAvatar=$("top-avatar");if(telegramUser.photo_url){topAvatar.innerHTML=`<img src="${safeText(telegramUser.photo_url)}" alt="Profile">`;}else{topAvatar.textContent=(telegramUser.first_name||"👤").slice(0,1);}}
-setInterval(()=>{const old=data.energy;recoverEnergy();const energy=$("energy"),bar=$("energybar");if(energy)energy.textContent=fmt(data.energy);if(bar)bar.style.width=(data.energy/MAX*100)+"%";if(old!==data.energy)save();},1000);
-// Refresh the leaderboard automatically every 5 seconds while its page is open.
-setInterval(()=>{if(data.page==="league")loadCoinRank();},5000);
-render();
-</script>
- <!-- OWL COIN Join & Claim -->
-<div id="joinClaimBox">
-  <button id="joinChannelBtn">JOIN CHANNEL</button>
-  <button id="claimBtn" style="display:none;">CLAIM 10,000 COIN</button>
-  <p id="claimStatus"></p>
-</div>
-  <script>
-const joinBtn = document.getElementById("joinChannelBtn");
-const claimBtn = document.getElementById("claimBtn");
-const claimStatus = document.getElementById("claimStatus");
+/* =========================
+   TELEGRAM
+========================= */
 
-const SUPABASE_FUNCTION =
-  "https://kevqqgruoaparmkstmfr.supabase.co/functions/v1/register-user";
+const tg = window.Telegram?.WebApp;
 
-joinBtn.onclick = () => {
-  window.open("https://t.me/owlcoin137", "_blank");
+tg?.ready();
+tg?.expand();
 
-  claimStatus.textContent =
-    "Channel-এ Join করে আবার এই অ্যাপে ফিরে আসুন।";
-  
-  claimBtn.style.display = "block";
+
+/* =========================
+   SUPABASE
+========================= */
+
+const SUPABASE_URL =
+"https://kevqqgruoaparmkstmfr.supabase.co";
+
+/*
+ IMPORTANT:
+ এখানে তোমার নিজের PUBLISHABLE KEY বসাবে।
+ SERVICE ROLE KEY এখানে কখনো বসাবে না।
+*/
+const SUPABASE_KEY =
+"sb_publishable_Anzwioa-AzlstiMSgPHu8Q_0-WCoymH";
+
+const supabaseClient =
+window.supabase?.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+/* =========================
+   FUNCTIONS
+========================= */
+
+const REGISTER_FUNCTION =
+"https://kevqqgruoaparmkstmfr.supabase.co/functions/v1/register-user";
+
+const LEADERBOARD_FUNCTION =
+"https://kevqqgruoaparmkstmfr.supabase.co/functions/v1/leaderboard";
+
+
+/* =========================
+   USER
+========================= */
+
+const telegramUser =
+tg?.initDataUnsafe?.user || null;
+
+
+/* =========================
+   LOCAL UI STATE
+========================= */
+
+const defaults = {
+  score:0,
+  energy:1000,
+  lastEnergy:Date.now(),
+  level:1,
+  page:"home"
 };
 
-claimBtn.onclick = async () => {
-  const tg = window.Telegram?.WebApp;
-  const user = tg?.initDataUnsafe?.user;
+let data = {
+  ...defaults
+};
 
-  if (!user?.id) {
-    claimStatus.textContent =
-      "Telegram user তথ্য পাওয়া যাচ্ছে না।";
+try{
+  const saved =
+    JSON.parse(localStorage.getItem("owl_ui") || "{}");
+
+  data = {
+    ...defaults,
+    ...saved
+  };
+}catch(e){}
+
+
+/* =========================
+   HELPERS
+========================= */
+
+const $ = id =>
+document.getElementById(id);
+
+function fmt(number){
+  return Math.floor(Number(number)||0)
+    .toLocaleString();
+}
+
+function saveUI(){
+  try{
+    localStorage.setItem(
+      "owl_ui",
+      JSON.stringify({
+        energy:data.energy,
+        lastEnergy:data.lastEnergy,
+        level:data.level,
+        page:data.page
+      })
+    );
+  }catch(e){}
+}
+
+function safeText(value){
+  return String(value ?? "")
+    .replace(/[&<>"']/g,c=>({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[c]));
+}
+
+
+/* =========================
+   ENERGY
+========================= */
+
+const MAX_ENERGY = 1000;
+
+function recoverEnergy(){
+
+  const now = Date.now();
+
+  const elapsed =
+    Math.floor(
+      (now - (data.lastEnergy || now)) / 3000
+    );
+
+  if(elapsed > 0){
+
+    data.energy =
+      Math.min(
+        MAX_ENERGY,
+        data.energy + elapsed
+      );
+
+    data.lastEnergy =
+      now;
+
+    saveUI();
+  }
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+function header(title,sub){
+
+  return `
+    <h2>${title}</h2>
+    <div class="small">${sub}</div>
+  `;
+}
+
+
+/* =========================
+   HOME
+========================= */
+
+function home(){
+
+  return `
+
+  ${header(
+    "Welcome to OWL COIN!",
+    "Tap the owl and collect COIN"
+  )}
+
+  <div class="score" id="score">
+    ${fmt(data.score)}
+  </div>
+
+  <div class="small">
+    🪙 OWL COIN
+  </div>
+
+  <div class="energy">
+
+    ⚡
+    <b id="energy">
+      ${fmt(data.energy)}
+    </b>
+    / ${MAX_ENERGY}
+
+    <div class="energybar">
+      <div
+        id="energybar"
+        style="width:${data.energy/MAX_ENERGY*100}%">
+      </div>
+    </div>
+
+  </div>
+
+
+  <div
+    class="coin"
+    id="coin">
+    🦉
+  </div>
+
+  <div class="small">
+    TAP THE OWL TO EARN COINS
+  </div>
+
+
+  <div class="stats">
+
+    <div class="stat">
+      <strong>
+        ⚡ Level ${data.level}
+      </strong>
+      <span class="small">
+        Tap Power: ${data.level} COIN
+      </span>
+    </div>
+
+    <div class="stat">
+      <strong>
+        🏆 OWL
+      </strong>
+      <span class="small">
+        Miner
+      </span>
+    </div>
+
+  </div>
+
+
+  <!-- JOIN & CLAIM -->
+
+  <div class="claim-box">
+
+    <div class="claim-icon">
+      🎁
+    </div>
+
+    <div class="claim-title">
+      JOIN & CLAIM
+    </div>
+
+    <div class="claim-reward">
+      +10,000 COIN
+    </div>
+
+    <div class="small">
+      Join the official OWL COIN channel
+      and claim your welcome reward.
+    </div>
+
+    <button
+      class="wide"
+      id="joinBtn">
+      📢 JOIN CHANNEL
+    </button>
+
+    <button
+      class="wide"
+      id="claimBtn"
+      style="display:none">
+      🎁 VERIFY & CLAIM
+    </button>
+
+    <div
+      class="claim-status"
+      id="claimStatus">
+    </div>
+
+  </div>
+
+
+  <!-- BOOST -->
+
+  <div class="panel">
+
+    <h3>🚀 Boost</h3>
+
+    <p class="small">
+      Upgrade your Boost Level to unlock
+      bigger rewards.
+    </p>
+
+    <button
+      class="wide"
+      disabled>
+      BOOST LEVEL 1
+    </button>
+
+    <p class="notice">
+      Boost system will be connected to
+      the server-controlled reward system.
+    </p>
+
+  </div>
+
+  `;
+}
+
+
+/* =========================
+   FRIENDS
+========================= */
+
+function friends(){
+
+  return `
+
+  ${header(
+    "👥 Friends",
+    "Invite friends to OWL COIN"
+  )}
+
+  <div class="panel">
+
+    <div style="font-size:55px">
+      🦉🤝🦉
+    </div>
+
+    <h3>
+      Invite Friends
+    </h3>
+
+    <p class="small">
+      Share OWL COIN with your friends.
+    </p>
+
+    <button
+      class="wide"
+      id="shareBtn">
+      📨 INVITE FRIENDS
+    </button>
+
+  </div>
+
+  `;
+}
+
+
+/* =========================
+   TASKS
+========================= */
+
+function tasks(){
+
+  return `
+
+  ${header(
+    "🎯 Tasks",
+    "Complete tasks and earn rewards"
+  )}
+
+  <div
+    class="panel">
+
+    <h3>
+      🦉 OWL COIN Tasks
+    </h3>
+
+    <p class="small">
+      Tasks are controlled from the server.
+    </p>
+
+  </div>
+
+  <div id="taskList">
+
+    <div class="empty">
+      Loading tasks...
+    </div>
+
+  </div>
+
+  `;
+}
+
+
+/* =========================
+   RANK
+========================= */
+
+function league(){
+
+  return `
+
+  ${header(
+    "🏆 COIN RANK",
+    "Top 100 miners"
+  )}
+
+  <div class="panel">
+
+    <div style="font-size:42px">
+      🏆
+    </div>
+
+    <h3>
+      TOP 100
+    </h3>
+
+    <p class="notice">
+      Ranking is loaded from the server.
+    </p>
+
+  </div>
+
+  <div id="rank-list">
+
+    <div class="empty">
+      Loading Coin Rank...
+    </div>
+
+  </div>
+
+  `;
+}
+
+
+/* =========================
+   RENDER
+========================= */
+
+function render(){
+
+  recoverEnergy();
+
+  const pages = {
+    home,
+    friends,
+    tasks,
+    league
+  };
+
+  $("screen").innerHTML =
+    pages[data.page]();
+
+  document
+    .querySelectorAll(".tab")
+    .forEach(tab=>{
+      tab.classList.toggle(
+        "active",
+        tab.dataset.page === data.page
+      );
+    });
+
+  bindEvents();
+
+  if(data.page === "league"){
+    loadCoinRank();
+  }
+
+  if(data.page === "tasks"){
+    loadTasks();
+  }
+}
+
+
+/* =========================
+   BIND
+========================= */
+
+function bindEvents(){
+
+  const coin =
+    $("coin");
+
+  if(coin){
+
+    coin.addEventListener(
+      "pointerdown",
+      e=>{
+        if(e.cancelable)
+          e.preventDefault();
+
+        tap();
+      },
+      {passive:false}
+    );
+  }
+
+
+  const joinBtn =
+    $("joinBtn");
+
+  if(joinBtn){
+
+    joinBtn.onclick = openChannel;
+  }
+
+
+  const claimBtn =
+    $("claimBtn");
+
+  if(claimBtn){
+
+    claimBtn.onclick =
+      claimJoinBonus;
+  }
+
+
+  const shareBtn =
+    $("shareBtn");
+
+  if(shareBtn){
+
+    shareBtn.onclick =
+      shareGame;
+  }
+}
+
+
+/* =========================
+   TAP
+========================= */
+
+function tap(){
+
+  recoverEnergy();
+
+  if(data.energy <= 0)
+    return;
+
+  data.energy -= 1;
+
+  /*
+   UI preview only.
+   Real balance will be server controlled.
+  */
+  data.score += data.level;
+
+  saveUI();
+
+  const score =
+    $("score");
+
+  const energy =
+    $("energy");
+
+  const bar =
+    $("energybar");
+
+  if(score)
+    score.textContent =
+      fmt(data.score);
+
+  if(energy)
+    energy.textContent =
+      fmt(data.energy);
+
+  if(bar)
+    bar.style.width =
+      (data.energy/MAX_ENERGY*100)+"%";
+
+
+  const coin =
+    $("coin");
+
+  if(coin){
+
+    coin.style.transform =
+      "scale(.94)";
+
+    setTimeout(()=>{
+      if($("coin"))
+        $("coin").style.transform =
+          "scale(1)";
+    },70);
+  }
+}
+
+
+/* =========================
+   JOIN CHANNEL
+========================= */
+
+function openChannel(){
+
+  const url =
+    "https://t.me/owlcoin137";
+
+  try{
+
+    if(tg?.openTelegramLink){
+
+      tg.openTelegramLink(url);
+
+    }else{
+
+      window.open(
+        url,
+        "_blank"
+      );
+
+    }
+
+  }catch(e){
+
+    window.open(
+      url,
+      "_blank"
+    );
+  }
+
+
+  const claimBtn =
+    $("claimBtn");
+
+  const status =
+    $("claimStatus");
+
+  if(claimBtn)
+    claimBtn.style.display =
+      "block";
+
+  if(status){
+
+    status.textContent =
+      "Channel-এ Join করে তারপর VERIFY & CLAIM চাপুন।";
+  }
+}
+
+
+/* =========================
+   SECURE JOIN CLAIM
+========================= */
+
+async function claimJoinBonus(){
+
+  const button =
+    $("claimBtn");
+
+  const status =
+    $("claimStatus");
+
+
+  if(!tg?.initData){
+
+    status.textContent =
+      "❌ Telegram user data পাওয়া যায়নি। Telegram Mini App থেকে খুলুন।";
+
     return;
   }
 
-  claimBtn.disabled = true;
-  claimStatus.textContent = "Checking membership...";
 
-  try {
-    const response = await fetch(SUPABASE_FUNCTION, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        telegram_id: user.id,
-        username: user.username || user.first_name || "",
-        photo_url: user.photo_url || ""
-      })
-    });
+  button.disabled =
+    true;
 
-    const data = await response.json();
+  status.textContent =
+    "⏳ Checking channel membership...";
 
-    if (data.claimed) {
-      claimStatus.textContent =
-        "🎉 10,000 COIN সফলভাবে Claim হয়েছে!";
-    } else if (data.joined) {
-      claimStatus.textContent =
-        data.message || "Bonus already claimed.";
-    } else {
-      claimStatus.textContent =
-        "❌ আগে Channel-এ Join করুন।";
+
+  try{
+
+    const response =
+      await fetch(
+        REGISTER_FUNCTION,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+
+            /*
+             IMPORTANT:
+             Server will verify this
+             cryptographically.
+            */
+            initData:
+              tg.initData
+
+          })
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if(!response.ok){
+
+      throw new Error(
+        result?.error ||
+        "Server error"
+      );
     }
 
-  } catch (error) {
-    console.error(error);
-    claimStatus.textContent =
-      "❌ Claim করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।";
-  }
 
-  claimBtn.disabled = false;
-};
+    if(result.claimed){
+
+      status.textContent =
+        "🎉 10,000 COIN সফলভাবে Claim হয়েছে!";
+
+      /*
+       Server returned balance.
+      */
+      if(
+        result.balance !== undefined
+      ){
+
+        data.score =
+          Number(result.balance);
+
+        saveUI();
+
+        const score =
+          $("score");
+
+        if(score)
+          score.textContent =
+            fmt(data.score);
+      }
+
+      button.textContent =
+        "✅ CLAIMED";
+
+      button.disabled =
+        true;
+
+      return;
+    }
+
+
+    if(result.already_claimed){
+
+      status.textContent =
+        "✅ এই Welcome Bonus আগে থেকেই Claim করা হয়েছে।";
+
+      button.textContent =
+        "✅ ALREADY CLAIMED";
+
+      button.disabled =
+        true;
+
+      return;
+    }
+
+
+    if(result.joined === false){
+
+      status.textContent =
+        "❌ আগে @owlcoin137 Channel-এ Join করুন।";
+
+      return;
+    }
+
+
+    status.textContent =
+      result.message ||
+      "❌ Claim করা যায়নি।";
+
+  }catch(error){
+
+    console.error(error);
+
+    status.textContent =
+      "❌ "+(
+        error.message ||
+        "Claim করতে সমস্যা হয়েছে।"
+      );
+
+  }finally{
+
+    if(
+      button &&
+      button.textContent !==
+      "✅ CLAIMED" &&
+      button.textContent !==
+      "✅ ALREADY CLAIMED"
+    ){
+
+      button.disabled =
+        false;
+    }
+  }
+}
+
+
+/* =========================
+   SHARE
+========================= */
+
+function shareGame(){
+
+  const text =
+    "🦉 Play OWL COIN and collect COIN!";
+
+  const url =
+    location.href;
+
+  if(tg?.openTelegramLink){
+
+    tg.openTelegramLink(
+      "https://t.me/share/url?url="+
+      encodeURIComponent(url)+
+      "&text="+
+      encodeURIComponent(text)
+    );
+
+  }else if(navigator.share){
+
+    navigator.share({
+      title:"OWL COIN",
+      text:text,
+      url:url
+    }).catch(()=>{});
+
+  }
+}
+
+
+/* =========================
+   LEADERBOARD
+========================= */
+
+async function loadCoinRank(){
+
+  const list =
+    $("rank-list");
+
+  if(!list)
+    return;
+
+
+  list.innerHTML =
+    `<div class="empty">
+      Loading Coin Rank...
+    </div>`;
+
+
+  try{
+
+    const response =
+      await fetch(
+        LEADERBOARD_FUNCTION
+      );
+
+
+    if(!response.ok)
+      throw new Error(
+        "Leaderboard server error"
+      );
+
+
+    const result =
+      await response.json();
+
+
+    const rows =
+      result?.profiles ||
+      result?.data ||
+      [];
+
+
+    if(!rows.length){
+
+      list.innerHTML =
+        `<div class="empty">
+          এখনো কোনো miner ranking-এ নেই।
+        </div>`;
+
+      return;
+    }
+
+
+    list.innerHTML = "";
+
+
+    rows
+      .slice(0,100)
+      .forEach((p,index)=>{
+
+        const row =
+          document.createElement("div");
+
+        row.className =
+          "rank-row";
+
+
+        const username =
+          p.username ||
+          "OWL Miner";
+
+
+        const photo =
+          p.photo_url;
+
+
+        row.innerHTML = `
+
+          <div class="rank-no">
+            ${
+              index===0 ? "🥇" :
+              index===1 ? "🥈" :
+              index===2 ? "🥉" :
+              "#"+(index+1)
+            }
+          </div>
+
+          <div class="rank-photo">
+            ${
+              photo
+              ? `<img src="${safeText(photo)}">`
+              : "🦉"
+            }
+          </div>
+
+          <div class="rank-user">
+
+            <div class="rank-name">
+              ${safeText(username)}
+            </div>
+
+            <div class="rank-handle">
+              OWL COIN Miner
+            </div>
+
+          </div>
+
+          <div class="rank-coins">
+            ${fmt(p.balance)}
+            <br>
+            <span class="small">
+              COIN
+            </span>
+          </div>
+
+        `;
+
+
+        list.appendChild(row);
+
+      });
+
+
+  }catch(error){
+
+    console.error(error);
+
+    list.innerHTML =
+      `<div class="empty">
+        ❌ Coin Rank এখন load করা যাচ্ছে না।
+      </div>`;
+  }
+}
+
+
+/* =========================
+   TASKS
+========================= */
+
+async function loadTasks(){
+
+  const box =
+    $("taskList");
+
+  if(!box)
+    return;
+
+
+  /*
+   Server-controlled tasks.
+  */
+
+  try{
+
+    if(!supabaseClient){
+
+      box.innerHTML =
+        `<div class="empty">
+          Task service unavailable.
+        </div>`;
+
+      return;
+    }
+
+
+    const {
+      data:rows,
+      error
+    } =
+      await supabaseClient
+        .from("tasks")
+        .select(
+          "id,title,description,reward,task_url"
+        )
+        .eq(
+          "is_active",
+          true
+        );
+
+
+    if(error)
+      throw error;
+
+
+    if(!rows?.length){
+
+      box.innerHTML =
+        `<div class="empty">
+          এখন কোনো active task নেই।
+        </div>`;
+
+      return;
+    }
+
+
+    box.innerHTML = "";
+
+
+    rows.forEach(task=>{
+
+      const item =
+        document.createElement("div");
+
+      item.className =
+        "item";
+
+
+      const info =
+        document.createElement("div");
+
+
+      info.innerHTML = `
+        <b>${safeText(task.title)}</b>
+        <div class="small">
+          ${safeText(task.description || "")}
+        </div>
+        <div class="small">
+          🎁 ${fmt(task.reward)} COIN
+        </div>
+      `;
+
+
+      item.appendChild(info);
+
+
+      if(task.task_url){
+
+        const btn =
+          document.createElement("button");
+
+        btn.textContent =
+          "OPEN";
+
+        btn.onclick = ()=>{
+
+          if(tg?.openLink)
+            tg.openLink(task.task_url);
+          else
+            window.open(
+              task.task_url,
+              "_blank"
+            );
+
+        };
+
+        item.appendChild(btn);
+      }
+
+
+      box.appendChild(item);
+
+    });
+
+
+  }catch(error){
+
+    console.error(error);
+
+    box.innerHTML =
+      `<div class="empty">
+        Tasks load করা যায়নি।
+      </div>`;
+  }
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+document
+  .querySelectorAll(".tab")
+  .forEach(tab=>{
+
+    tab.addEventListener(
+      "click",
+      ()=>{
+
+        data.page =
+          tab.dataset.page;
+
+        saveUI();
+
+        render();
+
+      }
+    );
+
+  });
+
+
+/* =========================
+   PROFILE PHOTO
+========================= */
+
+if(telegramUser){
+
+  const avatar =
+    $("top-avatar");
+
+  if(telegramUser.photo_url){
+
+    avatar.innerHTML =
+      `<img src="${safeText(
+        telegramUser.photo_url
+      )}">`;
+
+  }else{
+
+    avatar.textContent =
+      (
+        telegramUser.first_name ||
+        "👤"
+      ).slice(0,1);
+  }
+}
+
+
+/* =========================
+   ENERGY TIMER
+========================= */
+
+setInterval(()=>{
+
+  recoverEnergy();
+
+  const energy =
+    $("energy");
+
+  const bar =
+    $("energybar");
+
+  if(energy)
+    energy.textContent =
+      fmt(data.energy);
+
+  if(bar)
+    bar.style.width =
+      (data.energy/MAX_ENERGY*100)+"%";
+
+},1000);
+
+
+/* =========================
+   START
+========================= */
+
+render();
+
 </script>
+
 </body>
 </html>
