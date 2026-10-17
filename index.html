@@ -253,6 +253,50 @@ async function loadOwlCoinTasks() {
 
 loadOwlCoinTasks();
 </script>
+ <div id="owl-tasks">
+  <h2>🦉 OWL COIN TASKS</h2>
+  <p>Loading tasks...</p>
+</div>
+
+<script>
+async function showOwlTasks() {
+  const box = document.getElementById("owl-tasks");
+
+  try {
+    const response = await fetch(
+      "https://kevqqgruoaparmkstmfr.supabase.co/functions/v1/get-tasks"
+    );
+
+    if (!response.ok) throw new Error("Failed to load");
+
+    const tasks = await response.json();
+
+    box.innerHTML = "<h2>🦉 OWL COIN TASKS</h2>";
+
+    tasks.forEach(task => {
+      const item = document.createElement("div");
+      item.style.cssText =
+        "padding:12px;margin:10px 0;border:1px solid #777;border-radius:12px";
+
+      const title = document.createElement("h3");
+      title.textContent = task.title;
+
+      const desc = document.createElement("p");
+      desc.textContent = task.description || "";
+
+      const reward = document.createElement("p");
+      reward.textContent = "🎁 Reward: " + task.reward + " Coins";
+
+      item.append(title, desc, reward);
+      box.appendChild(item);
+    });
+  } catch {
+    box.textContent = "Task loading failed. Please try again.";
+  }
+}
+
+showOwlTasks();
+</script>
 </body>
 </html>
 
