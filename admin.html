@@ -16,6 +16,7 @@
 <div class="card"><div class="topline"><div><h2 style="margin-bottom:4px">Task Dashboard</h2><div id="signedIn" class="hint"></div></div><button id="logoutBtn" class="btn secondary" type="button">LOGOUT</button></div><div class="stats" style="margin-top:16px"><div class="stat"><span class="hint">মোট Task</span><strong id="totalCount">0</strong></div><div class="stat"><span class="hint">Active</span><strong id="activeCount">0</strong></div><div class="stat"><span class="hint">Inactive</span><strong id="inactiveCount">0</strong></div></div></div>
 <div class="card"><h2 id="formHeading">নতুন Task যোগ করুন</h2><form id="taskForm"><label for="title">Task Title *</label><input id="title" maxlength="160" required placeholder="যেমন: Join our Telegram channel"><label for="description">Description</label><textarea id="description" maxlength="2000" placeholder="Task সম্পর্কে বিস্তারিত"></textarea><label for="reward">Reward Points *</label><input id="reward" type="number" min="0" max="1000000000" step="1" required placeholder="100"><label for="taskUrl">Task URL (ঐচ্ছিক)</label><input id="taskUrl" type="url" placeholder="https://example.com"><div class="row" style="margin-top:14px"><button id="saveBtn" class="btn" type="submit">ADD TASK</button><button id="cancelEditBtn" class="btn secondary hidden" type="button">CANCEL EDIT</button></div></form><p id="formStatus" class="status" role="status" aria-live="polite"></p></div>
 <div class="card"><div class="topline"><h2 style="margin:0">সব Task</h2><button id="refreshBtn" class="btn secondary" type="button">↻ Refresh</button></div><label for="search">Task খুঁজুন</label><input id="search" type="search" placeholder="নাম বা বিবরণ লিখুন…"><div id="taskList" aria-live="polite"><div class="empty">Task লোড হচ্ছে…</div></div><p id="listStatus" class="status" role="status" aria-live="polite"></p></div>
+<div class="card"><h2>অ্যাপের Theme ও Logo</h2><p class="hint">এখানে সেটিংস Supabase-এ সেভ হবে। মূল অ্যাপে দেখাতে index.html-এ সেটিংস লোড করার কোডও লাগবে।</p><label for="themeColor">Theme Color</label><input id="themeColor" type="color" value="#facc15" style="height:52px;padding:5px"><label for="logoUrl">Logo Image URL</label><input id="logoUrl" type="url" placeholder="https://example.com/owl-logo.png"><div class="row" style="margin-top:14px"><button id="saveSettingsBtn" class="btn" type="button">সেটিংস সেভ করুন</button><button id="resetSettingsBtn" class="btn secondary" type="button">Default করুন</button></div><div style="display:flex;gap:12px;align-items:center;margin-top:14px"><img id="logoPreview" alt="Logo preview" style="width:64px;height:64px;object-fit:contain;border-radius:12px;background:#07111f;display:none"><span id="settingsPreview" class="hint">Theme preview</span></div><p id="settingsStatus" class="status" role="status" aria-live="polite"></p></div>
 </section>
 <p class="hint" style="text-align:center;margin:24px 0">সুরক্ষিত ব্যবহারের জন্য Supabase-এ admin_users এবং RLS সেটআপ আবশ্যক।</p>
 </main>
@@ -43,7 +44,7 @@
     return true;
   }
   async function enter(user){
-    try{await verifyAdmin(user);showDashboard(user.email);await loadTasks();}
+    try{await verifyAdmin(user);showDashboard(user.email);await Promise.all([loadTasks(),loadSettings()]);}
     catch(e){await db.auth.signOut();showLogin('⛔ '+e.message);}
   }
   $('loginForm').addEventListener('submit',async e=>{
@@ -97,6 +98,25 @@
     try{const {data,error}=await db.from('tasks').select('id,title,description,reward,task_url,is_active').order('id',{ascending:false});if(error)throw error;tasks=data||[];renderTasks();say('listStatus','Task list আপডেট হয়েছে।');}
     catch(e){tasks=[];renderTasks();say('listStatus','Task লোড হয়নি: '+(e.message||'Unknown error')+'। SQL/RLS setup পরীক্ষা করো।');}
     finally{$('refreshBtn').disabled=false;}}
+  function applyTheme(color,logo){
+    if(/^#[0-9a-fA-F]{6}$/.test(color||'')){document.documentElement.style.setProperty('--gold',color);$('themeColor').value=color;$('settingsPreview').style.color=color;}
+    const preview=$('logoPreview');if(logo){try{const u=new URL(logo);if(['http:','https:'].includes(u.protocol)){preview.src=u.href;preview.style.display='block';$('logoUrl').value=u.href;}else{preview.style.display='none';}}catch{preview.style.display='none';}}else{preview.style.display='none';}
+  }
+  async function loadSettings(){
+    try{const {data,error}=await db.from('app_settings').select('id,theme_color,logo_url').eq('id','main').maybeSingle();if(error)throw error;
+      const color=data?.theme_color||'#facc15',logo=data?.logo_url||'';$('themeColor').value=color;$('logoUrl').value=logo;applyTheme(color,logo);say('settingsStatus','সেটিংস লোড হয়েছে।');
+    }catch(e){say('settingsStatus','সেটিংস লোড হয়নি: '+(e.message||'Unknown error')+'। SQL setup আপডেট করতে হবে।');}
+  }
+  $('saveSettingsBtn').addEventListener('click',async()=>{
+    const color=$('themeColor').value,logo=$('logoUrl').value.trim();
+    if(!/^#[0-9a-fA-F]{6}$/.test(color)){say('settingsStatus','সঠিক Theme Color দাও।');return;}
+    if(logo){try{const u=new URL(logo);if(!['http:','https:'].includes(u.protocol))throw new Error();}catch{say('settingsStatus','Logo URL অবশ্যই http/https হতে হবে।');return;}}
+    setBusy('saveSettingsBtn',true,'সেভ হচ্ছে…');
+    try{const {error}=await db.from('app_settings').upsert({id:'main',theme_color:color,logo_url:logo||null,updated_at:new Date().toISOString()},{onConflict:'id'});if(error)throw error;applyTheme(color,logo);say('settingsStatus','Theme ও Logo সেটিংস সেভ হয়েছে। মূল অ্যাপে দেখাতে index.html-এ integration লাগবে।');}
+    catch(e){say('settingsStatus','সেভ হয়নি: '+(e.message||'Unknown error')+'। app_settings table ও Admin RLS আছে কি না দেখো।');}
+    finally{setBusy('saveSettingsBtn',false);}
+  });
+  $('resetSettingsBtn').addEventListener('click',()=>{$('themeColor').value='#facc15';$('logoUrl').value='';applyTheme('#facc15','');say('settingsStatus','Default preview হয়েছে। স্থায়ী করতে “সেটিংস সেভ করুন” চাপো।');});
   $('refreshBtn').addEventListener('click',loadTasks);$('search').addEventListener('input',renderTasks);
   $('logoutBtn').addEventListener('click',async()=>{const {error}=await db.auth.signOut();if(error){say('listStatus','Logout error: '+error.message);return;}resetForm();showLogin('Logout সফল হয়েছে।');$('password').value='';});
   try{const {data,error}=await db.auth.getSession();if(error)throw error;if(data.session)await enter(data.session.user);}
