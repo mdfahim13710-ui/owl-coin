@@ -28,7 +28,7 @@ const defaults={score:0,energy:1000,lastEnergy:Date.now(),dailyDate:"",level:1,p
 let data;try{data={...defaults,...JSON.parse(localStorage.getItem("owl_data")||"{}")};}catch(e){data={...defaults};}
 const $=id=>document.getElementById(id),fmt=n=>Math.floor(Number(n)||0).toLocaleString(),MAX=1000;
 const SUPABASE_URL="https://kevqqgruoaparmkstmfr.supabase.co";
-const SUPABASE_KEY="sb_publishable_Anzwioa-AzlstiMSgPHu8Q_0-WCoymF";
+const SUPABASE_KEY="sb_publishable_Anzwioa-AzlstiMSgPHu8Q_0-WCoymH";
 const supabaseClient=window.supabase?.createClient(SUPABASE_URL,SUPABASE_KEY);
 const telegramUser=tg?.initDataUnsafe?.user||null;
 function save(){try{localStorage.setItem("owl_data",JSON.stringify(data));}catch(e){}}
