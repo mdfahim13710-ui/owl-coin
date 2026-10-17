@@ -1,159 +1,233 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OWL COIN Admin Panel</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      background: #101827;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    .panel {
-      max-width: 500px;
-      margin: 30px auto;
-      background: #1e293b;
-      padding: 22px;
-      border-radius: 16px;
-    }
-    h1 { color: #facc15; }
-    input, textarea, button {
-      box-sizing: border-box;
-      width: 100%;
-      padding: 12px;
-      margin: 7px 0;
-      border-radius: 8px;
-      border: 1px solid #475569;
-      font-size: 16px;
-    }
-    input, textarea {
-      background: #0f172a;
-      color: white;
-    }
-    button {
-      background: #facc15;
-      color: #111827;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .task {
-      padding: 12px;
-      margin-top: 12px;
-      border: 1px solid #475569;
-      border-radius: 10px;
-      overflow-wrap: anywhere;
-    }
-    #app { display: none; }
-    #status { overflow-wrap: anywhere; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OWL COIN | Admin Panel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:20px;background:#080f1e;color:#f8fafc;font-family:Arial,sans-serif}
+.panel{max-width:500px;margin:25px auto;padding:22px;background:#172238;border:1px solid #334155;border-radius:16px}
+h1{color:#facc15;text-align:center}
+h2,h3{text-align:center}
+input,textarea,button{display:block;width:100%;margin:10px 0;padding:13px;border-radius:9px;font-size:16px}
+input,textarea{background:#0b1220;color:white;border:1px solid #475569}
+button{background:#facc15;color:#111827;border:none;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.6}
+.secondary{background:#cbd5e1}
+.link{display:block;color:#fde68a;text-align:center;margin:16px}
+#app{display:none}
+#status{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
+.task{margin-top:10px;padding:12px;border:1px solid #475569;border-radius:9px;overflow-wrap:anywhere}
+</style>
 </head>
 <body>
-  <div class="panel">
-    <h1>🦉 OWL COIN</h1>
-    <h2>Admin Panel</h2>
+<main class="panel">
+<h1>🦉 OWL COIN</h1>
+<h2>Admin Panel</h2>
 
-    <div id="login">
-      <p>Admin Login</p>
-      <input id="email" type="email" placeholder="Admin Gmail">
-      <input id="password" type="password" placeholder="Admin password">
-      <button id="loginBtn">Login</button>
-    </div>
+<section id="login">
+<label for="email">Admin Gmail</label>
+<input id="email" type="email" placeholder="Registered Gmail" autocomplete="username">
+<label for="password">Password</label>
+<input id="password" type="password" placeholder="Supabase Auth Password" autocomplete="current-password">
+<button id="loginBtn" type="button">LOGIN</button>
+<a href="#" id="forgotBtn" class="link">Forgot Password?</a>
+</section>
 
-    <div id="app">
-      <h3>Add New Task</h3>
-      <input id="title" placeholder="Task title">
-      <textarea id="description" placeholder="Task description"></textarea>
-      <input id="reward" type="number" min="0" placeholder="Reward">
-      <input id="url" type="url" placeholder="Task URL (optional)">
-      <button id="addBtn">Add Task</button>
-      <button id="refreshBtn">Refresh Tasks</button>
-      <button id="logoutBtn">Logout</button>
-      <h3>Current Tasks</h3>
-      <div id="tasks"></div>
-    </div>
-    <p id="status" role="status"></p>
-  </div>
+<section id="app">
+<h3>নতুন Task যোগ করুন</h3>
+<input id="title" placeholder="Task title">
+<textarea id="description" placeholder="Task description"></textarea>
+<input id="reward" type="number" min="0" step="1" placeholder="Reward points">
+<input id="url" type="url" placeholder="Task URL (optional)">
+<button id="addBtn" type="button">ADD TASK</button>
+<button id="refreshBtn" class="secondary" type="button">REFRESH TASKS</button>
+<button id="logoutBtn" class="secondary" type="button">LOGOUT</button>
+<h3>বর্তমান Tasks</h3>
+<div id="tasks"></div>
+</section>
+<p id="status" role="status" aria-live="polite"></p>
+</main>
 
 <script>
-const SUPABASE_URL =
-  "https://kevqqgruoaparmkstmfr.supabase.co";
+(async function(){
+const $=id=>document.getElementById(id);
+const status=msg=>{$("status").textContent=msg};
 
-// Use the same Supabase Publishable Key as index.html.
-const SUPABASE_KEY = ""sb_publishable_Anzwioa-AzlstiMSgPHu8Q_0-WCoymH";";
+const SUPABASE_URL="https://kevqqgruoaparmkstmfr.supabase.co";
 
-if (!window.supabase) {
-  alert("Supabase library load হয়নি। পেজ Refresh করো।");
-  throw new Error("Supabase library missing");
+// এখানে index.html-এর Publishable Key বসাও
+const SUPABASE_KEY="sb_publishable_Anzwioa-AzlstiMSgPHu8Q_0-WCoymH";
+
+if(!window.supabase){
+status("ইন্টারনেট পরীক্ষা করো। Supabase লোড হয়নি।");
+return;
 }
-  const db = window.supabase.createClient(
-  SUPABASE_URL, SUPABASE_KEY
-);
-
-const $ = id => document.getElementById(id);
-const status = message => $("status").textContent = message;
-
-async function checkAdmin() {
-  const { data: { user } } = await db.auth.getUser();
-  $("login").style.display = user ? "none" : "block";
-  $("app").style.display = user ? "block" : "none";
-  if (user) await loadTasks();
+if(SUPABASE_KEY==="PASTE_YOUR_PUBLISHABLE_KEY_HERE"){
+status("আগে SUPABASE_KEY বসাও।");
+return;
 }
 
-$("loginBtn").onclick = async () => {
-  const { error } = await db.auth.signInWithPassword({
-    email: $("email").value.trim(),
-    password: $("password").value
-  });
-  if (error) return status("Login failed: " + error.message);
-  status("Logged in. Checking access...");
-  await checkAdmin();
-};
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-async function loadTasks() {
-  const { data, error } = await db.from("tasks")
-    .select("id,title,description,reward,task_url,is_active")
-    .order("id");
+$("loginBtn").addEventListener("click",async()=>{
+const email=$("email").value.trim();
+const password=$("password").value;
+if(!email||!password){
+status("Gmail ও Password দুটোই লিখো।");
+return;
+}
+$("loginBtn").disabled=true;
+status("Login হচ্ছে...");
+try{
+const {data,error}=await db.auth.signInWithPassword({email,password});
+if(error){
+status("LOGIN FAILED: Gmail অথবা Password সঠিক নয়।\n"+error.message);
+return;
+}
+if(!data.user){
+status("Login হয়নি। আবার চেষ্টা করো।");
+return;
+}
+$("login").style.display="none";
+$("app").style.display="block";
+await loadTasks();
+}catch(e){
+status("ERROR: "+e.message);
+}finally{
+$("loginBtn").disabled=false;
+}
+});
 
-  if (error) {
-    status("Cannot load tasks. Admin database permissions are not configured yet.");
-    return;
-  }
+$("forgotBtn").addEventListener("click",async e=>{
+e.preventDefault();
+const email=$("email").value.trim();
+if(!email){
+status("আগে Gmail ঘরে তোমার registered email লেখো।");
+$("email").focus();
+return;
+}
+status("Password reset email পাঠানো হচ্ছে...");
+try{
+const {error}=await db.auth.resetPasswordForEmail(email,{
+redirectTo:"https://mdfahim13710-ui.github.io/owl-coin/admin.html"
+});
+status(error?"Reset failed: "+error.message:"Request পাঠানো হয়েছে। Gmail Inbox ও Spam চেক করো।");
+}catch(e){
+status("ERROR: "+e.message);
+}
+});
 
-  $("tasks").replaceChildren();
-  data.forEach(task => {
-    const item = document.createElement("div");
-    item.className = "task";
-    const heading = document.createElement("strong");
-    heading.textContent = task.title;
-    const detail = document.createElement("p");
-    detail.textContent =
-      (task.description || "") + " | Reward: " + task.reward;
-    const state = document.createElement("p");
-    state.textContent = task.is_active ? "Active" : "Inactive";
-    item.append(heading, detail, state);
-    $("tasks").appendChild(item);
-  });
+async function loadTasks(){
+$("tasks").textContent="Tasks লোড হচ্ছে...";
+try{
+const {data,error}=await db.from("tasks")
+.select("id,title,description,reward,task_url,is_active")
+.order("id");
+if(error){
+$("tasks").textContent="";
+status("Task লোড হয়নি: "+error.message);
+return;
+}
+$("tasks").replaceChildren();
+if(!data||!data.length){
+$("tasks").textContent="কোনো Task নেই।";
+return;
+}
+data.forEach(task=>{
+const card=document.createElement("div");
+card.className="task";
+const title=document.createElement("strong");
+title.textContent=task.title;
+const info=document.createElement("p");
+info.textContent=(task.description||"")+" | Reward: "+task.reward;
+const active=document.createElement("p");
+active.textContent=task.is_active?"Active":"Inactive";
+card.append(title,info,active);
+$("tasks").appendChild(card);
+});
+status("Task list আপডেট হয়েছে।");
+}catch(e){
+$("tasks").textContent="";
+status("ERROR: "+e.message);
+}
 }
 
-$("addBtn").onclick = async () => {
-  status("Login button is working!");
-  status("Task creation requires secure admin-only database permissions.");
-};
+$("addBtn").addEventListener("click",async()=>{
+const title=$("title").value.trim();
+const description=$("description").value.trim();
+const rewardText=$("reward").value;
+const taskUrl=$("url").value.trim();
+const reward=Number(rewardText);
 
-$("refreshBtn").onclick = loadTasks;
+if(!title||rewardText===""||!Number.isSafeInteger(reward)||reward<0){
+status("সঠিক Task title ও Reward points লিখো।");
+return;
+}
+if(taskUrl){
+try{
+const parsed=new URL(taskUrl);
+if(!["https:","http:"].includes(parsed.protocol)){
+status("Task URL সঠিক নয়।");
+return;
+}
+}catch{
+status("Task URL সঠিক নয়।");
+return;
+}
+}
+$("addBtn").disabled=true;
+status("Task যোগ হচ্ছে...");
+try{
+const {error}=await db.from("tasks").insert({
+title,description,reward,task_url:taskUrl||null,is_active:true
+});
+if(error){
+status("Task যোগ হয়নি: "+error.message+"\nSupabase RLS/permission ঠিক করতে হবে।");
+return;
+}
+$("title").value="";
+$("description").value="";
+$("reward").value="";
+$("url").value="";
+status("Task সফলভাবে যোগ হয়েছে!");
+await loadTasks();
+}catch(e){
+status("ERROR: "+e.message);
+}finally{
+$("addBtn").disabled=false;
+}
+});
 
-$("logoutBtn").onclick = async () => {
-  await db.auth.signOut();
-  $("app").style.display = "none";
-  $("login").style.display = "block";
-  status("Logged out.");
-};
+$("refreshBtn").addEventListener("click",loadTasks);
 
-checkAdmin();
+$("logoutBtn").addEventListener("click",async()=>{
+const {error}=await db.auth.signOut();
+if(error){
+status("Logout failed: "+error.message);
+return;
+}
+$("app").style.display="none";
+$("login").style.display="block";
+$("password").value="";
+status("Logout সফল হয়েছে।");
+});
+
+try{
+const {data,error}=await db.auth.getSession();
+if(error){
+status("Session error: "+error.message);
+}else if(data.session){
+$("login").style.display="none";
+$("app").style.display="block";
+await loadTasks();
+}
+}catch(e){
+status("Startup error: "+e.message);
+}
+})();
 </script>
 </body>
 </html>
