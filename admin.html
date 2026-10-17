@@ -85,7 +85,11 @@ const SUPABASE_URL =
 // Use the same Supabase Publishable Key as index.html.
 const SUPABASE_KEY = ""sb_publishable_Anzwioa-AzlstiMSgPHu8Q_0-WCoymH";";
 
-const db = window.supabase.createClient(
+if (!window.supabase) {
+  alert("Supabase library load হয়নি। পেজ Refresh করো।");
+  throw new Error("Supabase library missing");
+}
+  const db = window.supabase.createClient(
   SUPABASE_URL, SUPABASE_KEY
 );
 
