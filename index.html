@@ -225,6 +225,33 @@ setInterval(()=>{
 },1000);
 render();
 </script>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://kevqqgruoaparmkstmfr.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Anzwioa-AzlstiMSgPHu8Q_0-WCoymH";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+async function loadOwlCoinTasks() {
+  const { data, error } = await supabaseClient
+    .from("tasks")
+    .select("id, title, description, reward, task_url")
+    .eq("is_active", true);
+
+  if (error) {
+    console.error("Task loading error:", error.message);
+    return;
+  }
+
+  console.log("OWL COIN Tasks:", data);
+}
+
+loadOwlCoinTasks();
+</script>
 </body>
 </html>
 
